@@ -97,6 +97,13 @@
     position:absolute; top:8px; right:8px; z-index:2; font-size:10px; padding:3px 8px; border-radius:9999px;
     border:1px solid var(--border); background:#0000008c; backdrop-filter:blur(4px); color:#fff;
   }
+  .home-card-progress{
+    position:absolute; left:0; right:0; bottom:0; height:3px; z-index:3;
+    background:rgba(255,255,255,.15); overflow:hidden;
+  }
+  .home-card-progress-fill{
+    height:100%; background:var(--accent); transition:width .3s ease;
+  }
   .home-footer{text-align:center; color:var(--text-dim); font-size:11px; padding:10px 0 0}
   .home-copyright{
     margin-top:18px; padding:16px 4px 4px; border-top:1px solid var(--border);
@@ -120,7 +127,9 @@
   .icon-btn:active{opacity:.8}
   .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:4px; padding:0 12px 10px}
   .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04); cursor:pointer; transition:height .15s,background .15s}
+  .seg.viewed{background:var(--text-dim)}
   .seg.active{background:var(--accent)}
+  .seg.active.viewed{background:var(--accent)}
   .seg.current{height:6px}
 
   .tagrow-nav{flex-shrink:0; display:flex; gap:8px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
@@ -131,6 +140,7 @@
     white-space:nowrap; transition:opacity .2s;
   }
   .tagbtn.active{background:var(--accent); border-color:var(--accent); color:#fff}
+  .tagbtn.done::after{content:' ✓'; opacity:.7; font-size:10px}
 
   .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y pinch-zoom; min-height:0}
   .deck-card{height:100%; transition:transform .15s ease-out}
@@ -589,13 +599,18 @@ function renderHome(){
     '<div class="progress-badge">已閱覽 <span class="fill">'+getViewed().length+'</span> / '+TOTAL_PAGES+'</div>'+
     '<div class="home-footer">內容整理自團員訪談與樂團故事　．　點擊卡片開始閱讀</div>'+
     '</div><div class="home-grid">';
+  var viewed=getViewed();
   members.forEach(function(m,i){
     var cover=memberCoverSrc(m);
+    var doneCount=m.pages.filter(function(p){ return viewed.indexOf(p.id)!==-1; }).length;
+    var pct=Math.round(doneCount/m.pages.length*100);
+    var countLabel=doneCount===m.pages.length ? '✓ '+m.pages.length : doneCount+'/'+m.pages.length;
     html+='<button class="home-card" onclick="openMember('+i+')">'+
       '<img src="'+cover+'" alt="'+attr(m.zh)+'" loading="lazy">'+
       '<div class="home-card-scrim"></div>'+
-      '<div class="home-card-count">'+m.pages.length+'</div>'+
+      '<div class="home-card-count">'+countLabel+'</div>'+
       '<div class="home-card-label"><span class="home-card-name">'+m.zh+'</span><span class="home-card-sub">'+m.en+'</span></div>'+
+      '<div class="home-card-progress"><div class="home-card-progress-fill" style="width:'+pct+'%"></div></div>'+
     '</button>';
   });
   html+='</div>'+
@@ -610,17 +625,26 @@ function renderHome(){
 
 function renderProgress(){
   var m=currentMember(), curCh=currentChapterIdx();
+  var viewed=getViewed();
   var segs=m.pages.map(function(p,i){
-    var cls='seg'+(p._chapterIdx===curCh?' active':'')+(i===state.cardIdx?' current':'');
-    return '<div class="'+cls+'" onclick="jumpToIndex('+i+')"></div>';
+    var isViewed=viewed.indexOf(p.id)!==-1;
+    var cls='seg'
+      +(p._chapterIdx===curCh?' active':'')
+      +(i===state.cardIdx?' current':'')
+      +(isViewed?' viewed':'');
+    return '<div class="'+cls+'" onclick="jumpToIndex('+i+')" title="'+(isViewed?'已讀':'未讀')+'"></div>';
   }).join('');
   return '<div class="deck-progress">'+segs+'</div>';
 }
 
 function renderTags(){
   var m=currentMember(), curCh=currentChapterIdx();
+  var viewed=getViewed();
   return '<div class="tagrow-nav" id="tagrowNav">'+m.chapters.map(function(ch,i){
-    return '<button class="tagbtn'+(i===curCh?' active':'')+'" onclick="jumpToChapter('+i+')">'+attr(ch.title)+'</button>';
+    var chPages=m.pages.slice(ch.start, ch.start+ch.count);
+    var allDone=chPages.every(function(p){ return viewed.indexOf(p.id)!==-1; });
+    var cls='tagbtn'+(i===curCh?' active':'')+(allDone?' done':'');
+    return '<button class="'+cls+'" onclick="jumpToChapter('+i+')">'+attr(ch.title)+'</button>';
   }).join('')+'</div>';
 }
 
