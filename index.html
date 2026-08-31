@@ -47,6 +47,14 @@
     border:1px solid var(--border); background:#0000008c; backdrop-filter:blur(4px); color:#fff;
   }
   .home-footer{text-align:center; color:var(--text-dim); font-size:11px; padding:24px 0 4px}
+  .home-copyright{
+    margin-top:18px; padding:16px 4px 4px; border-top:1px solid var(--border);
+    color:var(--text-dim); font-size:10.5px; line-height:1.75;
+  }
+  .home-copyright p{margin:0 0 8px}
+  .home-copyright p:last-child{margin-bottom:0}
+  .home-copyright strong{color:var(--text); font-size:11px}
+  .home-copyright a{color:var(--text-dim); text-decoration:underline}
 
   /* ---- deck ---- */
   .deck{display:flex; flex-direction:column; height:100dvh; overflow:hidden}
@@ -430,7 +438,13 @@ function renderHome(){
       '<div class="home-card-label"><span class="home-card-name">'+m.zh+'</span><span class="home-card-sub">'+m.en+'</span></div>'+
     '</button>';
   });
-  html+='</div><div class="home-footer">內容整理自團員訪談與樂團故事整理　．　點卡片進入閱讀</div></div>';
+  html+='</div><div class="home-footer">內容整理自團員訪談與樂團故事整理　．　點卡片進入閱讀</div>'+
+    '<div class="home-copyright">'+
+      '<p><strong>版權聲明</strong></p>'+
+      '<p>本網站為 Linkin Park 樂團粉絲自製之非官方資訊整理頁面，內容目的為推廣與分享樂團故事，並非以營利為目的，網站亦不含任何廣告或商業行為。本網站與 Linkin Park 官方、其經紀公司或唱片公司無任何關聯，亦非其授權之代理或發言單位；若您欲聯繫樂團本人或洽談演出等官方事務，請勿透過本站聯繫，我們無法提供相關協助。</p>'+
+      '<p>本網站之敘事文字（人物背景、時間序整理）為站方消化資料後重新撰寫；文中引號標示之受訪者發言，則保留原話以呈現真實語境，其著作權仍屬原受訪者、媒體或原始出處所有。網站中所使用之圖片、影像及相關素材，其著作權均歸原著作權人（包含但不限於樂團、唱片公司、攝影師及原始創作者）所有，我們並未持有、亦不主張擁有這些素材的任何權利，僅基於分享與推廣之善意目的整理呈現。</p>'+
+      '<p>若您是相關素材之原著作權人，對本網站之引用方式有任何疑慮、希望我們附上來源標註，或希望下架相關內容，都歡迎告知，我們將依您的意願盡快處理：<a href="mailto:majorocelot222@gmail.com">majorocelot222@gmail.com</a></p>'+
+    '</div></div>';
   return html;
 }
 
