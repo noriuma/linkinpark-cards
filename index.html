@@ -17,6 +17,7 @@
     margin:0; padding:0; background:var(--bg); color:var(--text);
     overscroll-behavior-y:none; -webkit-tap-highlight-color:transparent;
     font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    touch-action:manipulation;
   }
   button{font-family:inherit}
   img{-webkit-user-drag:none; -webkit-user-select:none; user-select:none}
@@ -72,14 +73,14 @@
   }
   .tagbtn.active{background:var(--accent); border-color:var(--accent); color:#fff}
 
-  .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y; min-height:0}
+  .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y pinch-zoom; min-height:0}
   .deck-card{height:100%; transition:transform .15s ease-out}
   .page-card{position:relative; height:100%; border:1px solid var(--border); border-radius:20px; background:#000; overflow:hidden}
   .page-card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in}
   .page-card-scrim{position:absolute; inset:0; background:linear-gradient(#0000 36%,#000000e6 100%); pointer-events:none}
-  .pic-picker{position:absolute; top:10px; left:10px; right:10px; display:flex; flex-wrap:wrap; gap:6px}
+  .pic-picker{position:absolute; top:10px; left:10px; right:10px; display:flex; flex-wrap:wrap; gap:6px; pointer-events:none}
   .pic-dot{
-    width:30px; height:30px; border-radius:50%; object-fit:cover; cursor:pointer;
+    width:30px; height:30px; border-radius:50%; object-fit:cover; cursor:pointer; pointer-events:auto;
     border:2px solid rgba(255,255,255,.55); box-shadow:0 1px 4px rgba(0,0,0,.5); flex-shrink:0;
   }
   .pic-dot.active{border-color:var(--accent); box-shadow:0 0 0 2px #fff}
@@ -383,6 +384,13 @@ function cancelNav(){ state.pendingNav=null; renderApp(); }
 function openLightbox(src){ state.lightbox=src; renderApp(); }
 function closeLightbox(){ state.lightbox=null; renderApp(); }
 
+function onImgTap(e,src){
+  var w=e.currentTarget.clientWidth, x=e.offsetX;
+  if(x<w*0.35){ prevCard(); }
+  else if(x>w*0.65){ nextCard(); }
+  else { openLightbox(src); }
+}
+
 var touchStartX=0, touching=false;
 function cardTouchStart(e){ if(state.pendingNav!==null) return; touching=true; touchStartX=e.touches[0].clientX; state.dragX=0; }
 function cardTouchMove(e){
@@ -466,7 +474,7 @@ function renderCard(p){
   return '<div class="deck-card-wrap" ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd()">'+
     '<div class="deck-card">'+
       '<div class="page-card">'+
-        '<img class="page-card-img" src="'+activeSrc+'" alt="'+attr(p.name)+'" onclick="openLightbox(\''+activeSrc+'\')">'+
+        '<img class="page-card-img" src="'+activeSrc+'" alt="'+attr(p.name)+'" onclick="onImgTap(event,\''+activeSrc+'\')">'+
         '<div class="page-card-scrim"></div>'+
         picker+
         '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
