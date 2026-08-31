@@ -27,10 +27,27 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
     touch-action:manipulation;
   }
+  html::before{
+    content:''; position:fixed; inset:-20%; z-index:999; pointer-events:none; opacity:0;
+    background:radial-gradient(circle at 50% 35%, rgba(228,200,42,.82) 0%, rgba(228,200,42,.28) 14%, rgba(228,200,42,.06) 26%, rgba(0,0,0,0) 48%);
+    transition:opacity .65s ease, transform .65s ease;
+  }
+  html.theme-flashing::before{
+    animation:themeFlash .9s ease forwards;
+  }
+  @keyframes themeFlash{
+    0%{opacity:0; transform:scale(.96)}
+    16%{opacity:1; transform:scale(1)}
+    42%{opacity:1}
+    100%{opacity:0; transform:scale(1.06)}
+  }
   button{font-family:inherit}
   img{-webkit-user-drag:none; -webkit-user-select:none; user-select:none}
   #app{background:var(--bg); max-width:560px; min-height:100dvh; margin:0 auto; display:flex; flex-direction:column}
   @media(min-width:561px){ #app{border-inline:1px solid var(--border)} }
+  html,body,#app,.home-card,.home-card img,.page-card,.page-card-img,.icon-btn,.nav-btn,.tagbtn,.theme-toggle,.home-hero-title,.home-hero-sub,.home-footer,.progress-badge,.deck-header-name,.deck-header-count{
+    transition:background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease,filter .45s ease,opacity .45s ease;
+  }
 
   /* ---- home ---- */
   .home{position:relative; min-height:100dvh; padding:16px 16px calc(env(safe-area-inset-bottom) + 24px); display:flex; flex-direction:column}
@@ -158,6 +175,38 @@
   .nav-btn:active{opacity:.8}
   .nav-btn.primary{background:var(--text); border-color:var(--text); color:#1c1c1c; font-weight:700}
   .nav-btn:disabled{opacity:.35; cursor:default}
+  .progress-badge{
+  display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--text-dim);
+  border:1px solid var(--border); border-radius:9999px; padding:5px 12px; margin-top:14px;
+}
+.progress-badge .fill{ font-weight:700; color:var(--text) }
+
+.theme-toggle.locked{ cursor:default; opacity:.55 }
+.theme-toggle.locked .switch-track{ background:transparent; border-color:var(--border) }
+.theme-toggle.locked .switch-knob{
+  display:flex; align-items:center; justify-content:center; font-size:10px;
+  background:transparent; box-shadow:none;
+}
+
+.secret-overlay{
+  position:fixed; inset:0; z-index:80; background:#000000ee;
+  display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.secret-box{
+  max-width:380px; width:100%; text-align:center; border:1px solid var(--accent);
+  border-radius:20px; background:var(--bg-elevated); padding:40px 26px 30px;
+}
+.secret-box .secret-mark{ font-size:34px; font-weight:800; color:var(--accent); letter-spacing:2px; margin-bottom:6px }
+.secret-box h2{ margin:0 0 14px; font-size:19px; color:var(--text) }
+.secret-box p{ font-size:13.5px; line-height:1.85; color:var(--text-dim); margin:0 0 22px; white-space:pre-line }
+.secret-box .secret-actions{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap }
+.secret-box button{
+  padding:10px 22px; border-radius:9999px; border:none; background:var(--accent);
+  color:var(--bg); font-weight:800; cursor:pointer;
+}
+.secret-box .secret-secondary{
+  background:transparent; border:1px solid var(--border-interactive); color:var(--text); box-shadow:none;
+}
 </style>
 </head>
 <body>
@@ -353,6 +402,21 @@ var extraImages={
   108:["image225.jpg","image215.jpg","image221.jpg"]
 };
 function attr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+var UNSHATTER_COVER_MAP={
+  'Mike Shinoda':'mike_u.jpg',
+  'Joseph "Joe" Hahn':'joe_u.jpg',
+  'Dave "Phoenix" Farrell':'dave_u.jpg',
+  'Brad Delson':'brad_u.jpg',
+  'Emily Armstrong':'emily_u.jpg',
+  'Colin Brittain':'colin_u.jpg'
+};
+function memberCoverSrc(member){
+  if(document.documentElement.getAttribute('data-theme')==='unshatter'){
+    var key=member && member.en;
+    if(key && UNSHATTER_COVER_MAP[key]) return 'images/'+UNSHATTER_COVER_MAP[key];
+  }
+  return imgSrc(member.pages[0]);
+}
 function cardImages(p){
   var arr=[imgSrc(p)];
   var extras=extraImages[p.id];
@@ -393,28 +457,60 @@ members.forEach(function(m,mi){
   });
   m.chapters=chapters;
 });
+var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,dragX:0,dragging:false,lightbox:null,pendingNav:null,justUnlocked:false};
+var TOTAL_PAGES = pages.length;
+var VIEWED_KEY = 'lp-viewed-pages';
+var UNLOCK_KEY = 'lp-secret-unlocked';
 
-var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,dragX:0,dragging:false,lightbox:null,pendingNav:null};
-
-function currentMember(){ return members[state.memberIdx]; }
-function currentCard(){ return currentMember().pages[state.cardIdx]; }
-function currentChapterIdx(){ return currentCard()._chapterIdx; }
-function currentChapter(){ return currentMember().chapters[currentChapterIdx()]; }
-function setCard(i){ state.cardIdx=i; state.activeImgIdx=0; }
-
-function openMember(i){ state.memberIdx=i; setCard(0); state.view='deck'; renderApp(); }
-function goHome(){ state.view='home'; renderApp(); }
-
-function toggleTheme(){
-  var isUnshatter=document.documentElement.getAttribute('data-theme')==='unshatter';
-  if(isUnshatter){ document.documentElement.removeAttribute('data-theme'); }
-  else { document.documentElement.setAttribute('data-theme','unshatter'); }
-  try{ localStorage.setItem('lp-theme', isUnshatter?'dark':'unshatter'); }catch(e){}
+function getViewed(){
+  try{ return JSON.parse(localStorage.getItem(VIEWED_KEY)) || []; }
+  catch(e){ return []; }
+}
+function isUnlocked(){
+  try{ return localStorage.getItem(UNLOCK_KEY)==='1'; }catch(e){ return false; }
+}
+function markViewed(id){
+  var viewed=getViewed();
+  if(viewed.indexOf(id)===-1){
+    viewed.push(id);
+    try{ localStorage.setItem(VIEWED_KEY, JSON.stringify(viewed)); }catch(e){}
+    if(viewed.length>=TOTAL_PAGES && !isUnlocked()){
+      try{ localStorage.setItem(UNLOCK_KEY,'1'); }catch(e){}
+      state.justUnlocked=true; // 這次是「剛好集滿」的那一刻，觸發慶祝彈窗
+    }
+  }
+}
+function showLockedHint(){
+  var el=document.createElement('div');
+  el.textContent='看完全部 '+TOTAL_PAGES+' 頁的故事，即可解鎖 Unshatter Mode';
+  el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-interactive);padding:10px 16px;border-radius:9999px;font-size:12px;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.4);white-space:nowrap';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2200);
+}
+function dismissUnlock(){ state.justUnlocked=false; renderApp(); }
+function goHomeFromUnlock(){ state.justUnlocked=false; state.view='home'; renderApp(); }
+function activateUnshatterAndClose(){
+  document.documentElement.classList.remove('theme-flashing');
+  void document.documentElement.offsetWidth;
+  document.documentElement.classList.add('theme-flashing');
+  document.documentElement.setAttribute('data-theme','unshatter');
+  try{ localStorage.setItem('lp-theme','unshatter'); }catch(e){}
+  state.justUnlocked=false;
+  setTimeout(function(){
+    document.documentElement.classList.remove('theme-flashing');
+  }, 900);
   renderApp();
 }
-
 function jumpToChapter(i){ setCard(currentMember().chapters[i].start); renderApp(); }
 function jumpToIndex(i){ setCard(i); renderApp(); }
+
+function openMember(i){ state.memberIdx=i; state.cardIdx=0; state.activeImgIdx=0; state.view='deck'; renderApp(); }
+function currentMember(){ return members[state.memberIdx]; }
+function currentCard(){ return currentMember().pages[state.cardIdx]; }
+function currentChapter(){ return currentMember().chapters.find(function(ch){ return ch.start<=state.cardIdx && state.cardIdx<ch.start+ch.count; }); }
+function currentChapterIdx(){ return currentMember().chapters.findIndex(function(ch){ return ch.start<=state.cardIdx && state.cardIdx<ch.start+ch.count; }); }
+function setCard(n){ state.cardIdx=n; state.activeImgIdx=0; }
+function goHome(){ state.view='home'; state.pendingNav=null; state.lightbox=null; renderApp(); }
 
 function prevCard(){
   if(state.cardIdx>0){ setCard(state.cardIdx-1); renderApp(); }
@@ -465,8 +561,22 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='ArrowLeft') prevCard();
   else if(e.key==='Escape') goHome();
 });
-
+function toggleTheme(){
+  if(!isUnlocked()) return; // 沒解鎖前，理論上按鈕不會出現，這行是保險
+  var isUnshatter=document.documentElement.getAttribute('data-theme')==='unshatter';
+  if(isUnshatter){ document.documentElement.removeAttribute('data-theme'); }
+  else { document.documentElement.setAttribute('data-theme','unshatter'); }
+  try{ localStorage.setItem('lp-theme', isUnshatter?'dark':'unshatter'); }catch(e){}
+  renderApp();
+}
 function renderThemeToggle(compact){
+  if(!isUnlocked()){
+    var n=getViewed().length;
+    return '<button class="theme-toggle locked" onclick="showLockedHint()" aria-label="尚未解鎖">'+
+      '<span class="switch-track"><span class="switch-knob">🔒</span></span>'+
+      (compact?'':'<span class="switch-label">'+n+'/'+TOTAL_PAGES+'</span>')+
+    '</button>';
+  }
   var isUnshatter=document.documentElement.getAttribute('data-theme')==='unshatter';
   var label=isUnshatter?'Unshatter Mode':'Dark Mode';
   return '<button class="theme-toggle" onclick="toggleTheme()" aria-label="'+attr(label)+'">'+
@@ -479,10 +589,11 @@ function renderHome(){
   var html='<div class="home">'+renderThemeToggle()+'<div class="home-hero">'+
     '<h1 class="home-hero-title">LINKIN PARK</h1>'+
     '<p class="home-hero-sub">團員小百科．樂團故事卡片</p>'+
+    '<div class="progress-badge">已閱覽 <span class="fill">'+getViewed().length+'</span> / '+TOTAL_PAGES+'</div>'+
     '<div class="home-footer">內容整理自團員訪談與樂團故事整理　．　點卡片進入閱讀</div>'+
     '</div><div class="home-grid">';
   members.forEach(function(m,i){
-    var cover=imgSrc(m.pages[0]);
+    var cover=memberCoverSrc(m);
     html+='<button class="home-card" onclick="openMember('+i+')">'+
       '<img src="'+cover+'" alt="'+attr(m.zh)+'" loading="lazy">'+
       '<div class="home-card-scrim"></div>'+
@@ -527,6 +638,7 @@ function renderHeader(){
 }
 
 function renderCard(p){
+  markViewed(p.id); // 卡片被實際顯示出來才算「閱覽過」
   var paras=p.body.map(function(t){ return '<p>'+t+'</p>'; }).join('');
   var imgs=cardImages(p);
   var activeIdx=state.activeImgIdx<imgs.length?state.activeImgIdx:0;
@@ -576,18 +688,30 @@ function renderConfirm(){
       '<button class="nav-btn primary" onclick="confirmNav()">繼續</button>'+
     '</div></div></div>';
 }
+function renderUnlockCelebration(){
+  if(!state.justUnlocked) return '';
+  return '<div class="secret-overlay" onclick="if(event.target===event.currentTarget) dismissUnlock()"><div class="secret-box">'+
+    '<div class="secret-mark">ø</div>'+
+    '<h2>Unshatter Mode 已解鎖</h2>'+
+    '<p>你已經讀完了關於這支樂團的每一段故事——\n從 Mike 的童年鋼琴課，到 Chester 最後的那個夜晚，\n再到 Emily 與 Colin 加入後的重新開始。\n\n「Unshatter」不是抹去傷痕，\n而是把所有碎片重新拼回一起。\n\n現在，你可以切換到 Unshatter Mode 了。</p>'+
+    '<div class="secret-actions">'+
+      '<button class="secret-secondary" onclick="goHomeFromUnlock()">返回首頁</button>'+
+      '<button onclick="activateUnshatterAndClose()">立即切換</button>'+
+    '</div>'+
+  '</div></div>';
+}
 
 function renderApp(){
   var app=document.getElementById('app');
   if(state.view==='home'){
-    app.innerHTML=renderHome();
+    app.innerHTML=renderHome()+renderUnlockCelebration();
   } else {
-    app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm();
+    app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
   }
 }
-try{ if(localStorage.getItem('lp-theme')==='unshatter'){ document.documentElement.setAttribute('data-theme','unshatter'); } }catch(e){}
+try{ if(isUnlocked() && localStorage.getItem('lp-theme')==='unshatter'){ document.documentElement.setAttribute('data-theme','unshatter'); } }catch(e){}
 renderApp();
 </script>
 </body>
