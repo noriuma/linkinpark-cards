@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linkin Park 樂團介紹</title>
+<style>
+  :root{
+    --bg:#131113; --bg-elevated:#1a181a; --card:#131113;
+    --text:#f7f4ed; --text-dim:#9d9a94;
+    --border:rgba(247,244,237,.12); --border-interactive:rgba(247,244,237,.4);
+    --overlay-04:rgba(247,244,237,.04);
+    --accent:#e0263f; --accent-dim:#7a1420;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    overscroll-behavior-y:none; -webkit-tap-highlight-color:transparent;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  }
+  button{font-family:inherit}
+  img{-webkit-user-drag:none; -webkit-user-select:none; user-select:none}
+  #app{background:var(--bg); max-width:560px; min-height:100dvh; margin:0 auto; display:flex; flex-direction:column}
+  @media(min-width:561px){ #app{border-inline:1px solid var(--border)} }
+
+  /* ---- home ---- */
+  .home{min-height:100dvh; padding:16px 16px calc(env(safe-area-inset-bottom) + 24px); display:flex; flex-direction:column}
+  .home-hero{text-align:center; padding:36px 4px 30px}
+  .home-hero-title{margin:0; font-size:38px; font-weight:700; letter-spacing:-1px; line-height:1.05; color:var(--text)}
+  .home-hero-sub{margin:10px 0 0; font-size:13.5px; color:var(--text-dim)}
+  .home-grid{flex:1; display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+  .home-card{
+    position:relative; aspect-ratio:1; border:1px solid var(--border); background:var(--card);
+    border-radius:12px; padding:0; cursor:pointer; overflow:hidden; display:block;
+    transition:border-color .2s;
+  }
+  .home-card:active{opacity:.85}
+  .home-card:hover{border-color:var(--border-interactive)}
+  .home-card img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+  .home-card-scrim{position:absolute; inset:0; background:linear-gradient(#0000 45%,#000000e0 100%)}
+  .home-card-label{position:absolute; left:12px; right:12px; bottom:12px; display:flex; flex-direction:column; text-align:left}
+  .home-card-name{font-size:15px; font-weight:700; color:#fff}
+  .home-card-sub{margin-top:2px; font-size:10.5px; color:rgba(255,255,255,.72)}
+  .home-card-count{
+    position:absolute; top:8px; right:8px; font-size:10px; padding:3px 8px; border-radius:9999px;
+    border:1px solid var(--border); background:#0000008c; backdrop-filter:blur(4px); color:#fff;
+  }
+  .home-footer{text-align:center; color:var(--text-dim); font-size:11px; padding:24px 0 4px}
+
+  /* ---- deck ---- */
+  .deck{display:flex; flex-direction:column; height:100dvh; overflow:hidden}
+  .deck-header{padding:calc(env(safe-area-inset-top) + 10px) 12px 8px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between}
+  .deck-header-title{display:flex; flex-direction:column; align-items:center}
+  .deck-header-name{font-size:15px; font-weight:700; color:var(--text)}
+  .deck-header-count{margin-top:1px; font-size:11px; color:var(--text-dim)}
+  .icon-btn{
+    width:36px; height:36px; border-radius:9999px; border:1px solid var(--border);
+    background:var(--bg-elevated); color:var(--text); font-size:18px; line-height:1; cursor:pointer;
+  }
+  .icon-btn:active{opacity:.8}
+  .deck-progress{flex-shrink:0; display:flex; gap:4px; padding:0 12px 10px}
+  .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04)}
+  .seg.active,.seg.done{background:var(--accent)}
+
+  .tagrow-nav{flex-shrink:0; display:flex; gap:8px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
+  .tagrow-nav::-webkit-scrollbar{display:none}
+  .tagbtn{
+    flex-shrink:0; font-size:12px; font-weight:600; padding:6px 13px; border-radius:9999px;
+    border:1px solid var(--border-interactive); background:transparent; color:var(--text-dim); cursor:pointer;
+    white-space:nowrap; transition:opacity .2s;
+  }
+  .tagbtn.active{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y}
+  .deck-card{height:100%; transition:transform .15s ease-out}
+  .page-card{position:relative; height:100%; border:1px solid var(--border); border-radius:20px; background:#000; overflow:hidden}
+  .page-card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in}
+  .page-card-scrim{position:absolute; inset:0; background:linear-gradient(#0000 36%,#000000e6 100%); pointer-events:none}
+  .page-card-arrow{
+    position:absolute; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:9999px;
+    border:1px solid #ffffff40; background:#00000059; backdrop-filter:blur(6px); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1; cursor:pointer;
+  }
+  .page-card-arrow:active{opacity:.7}
+  .page-card-arrow.left{left:10px} .page-card-arrow.right{right:10px}
+  .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto}
+  .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
+  .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
+  .page-card-caption p{margin:0 0 10px; font-size:14px; line-height:1.7; color:#fff; text-shadow:0 1px 4px #0009; white-space:pre-line}
+  .page-card-caption p:last-child{margin-bottom:0}
+
+  .lightbox{position:fixed; inset:0; z-index:50; background:#000000eb; display:flex; align-items:center; justify-content:center; padding:16px}
+  .lightbox img{max-width:100%; max-height:100%; object-fit:contain}
+
+  .confirm-overlay{position:fixed; inset:0; z-index:60; background:#000000cc; display:flex; align-items:center; justify-content:center; padding:24px}
+  .confirm-box{background:var(--bg-elevated); border:1px solid var(--border); border-radius:16px; padding:26px 22px 20px; max-width:300px; width:100%; text-align:center}
+  .confirm-eyebrow{font-size:12px; color:var(--text-dim); margin-bottom:8px}
+  .confirm-name{font-size:20px; font-weight:700; color:var(--text); margin-bottom:22px}
+  .confirm-actions{display:flex; gap:10px}
+
+  .deck-nav{
+    position:sticky; bottom:0; flex-shrink:0; display:flex; gap:10px;
+    padding:10px 14px calc(env(safe-area-inset-bottom) + 12px);
+    background:linear-gradient(180deg,#13111300 0%,var(--bg) 35%);
+  }
+  .nav-btn{
+    flex:1; padding:10px 16px; border-radius:8px; border:1px solid var(--border-interactive);
+    background:transparent; color:var(--text); font-size:14px; cursor:pointer; transition:opacity .2s;
+  }
+  .nav-btn:active{opacity:.8}
+  .nav-btn.primary{background:var(--text); border-color:var(--text); color:#1c1c1c; font-weight:700}
+  .nav-btn:disabled{opacity:.35; cursor:default}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+var pages=[
+{id:1,name:"Mike Shinoda / 麥克篠田",arch:"A",sub:"1977年2月11日．團長、主唱(饒舌/唱歌/和聲)、鍵盤手、節奏吉他手、詞曲作者、音樂製作人",imgs:6,body:["日本名字是篠田賢治。","個性親切隨和風趣，還是天生的表情包表情超豐富。","小時候有嚴重的氣喘及貓過敏，隨著年齡增長後情況好轉但貓還是不太行的樣子。","可是他很喜歡貓，是 Hello Kitty 粉絲！","不菸不酒不毒不刺青，因為他覺得刺上去的圖案可能一個禮拜他就會膩了。","有點介意自己的頭看起來很大。"]},
+{id:2,name:"造型變化與日本文化興趣",arch:"C",sub:"綽號「膠水」／Spike Minoda．染髮史．Halo與任天堂",imgs:5,body:["因為Mike負責統籌整合所有的事情，團員們過去戲稱他為「膠水」","；因為年輕時的刺刺頭造型，也有 Spike Minoda 的綽號。","還染過五顏六色的頭髮，但第二張專輯後就不再用刺刺頭，也不染髮戴耳環了，說是想給自己小孩當榜樣。","喜愛各種日本文化，甚至有買 VOCALOID 來做歌過。","超喜歡任天堂，雖然有日本血統但完全不會日文。"]},
+{id:3,name:"造型變化與日本文化興趣",arch:"B",sub:"",imgs:5,body:["在巡迴巴士上會拉著團員一起打電動，非常喜歡 Halo，甚至拉贊助在自己的演唱會設 Halo 遊玩攤位跟粉絲同樂。","跟 Dave 玩 Halo 有絕佳的默契因此自稱他們是「夢幻隊伍」","。","從來不露出太多肌膚範圍，甚至常在演唱會的衣服裡穿內搭紮進褲子裡防肚子走光，出道20幾年了連鎖骨長什麼樣子都沒有看過⋯結果唯一的狗仔偷拍照是泳裝照(這是真的)。"]},
+{id:4,name:"歌聲自信心",arch:"B",sub:"從功能性唱腔到被Chester鼓勵",imgs:3,body:["其實對自己的歌聲非常沒有自信，說他是自己歌聲的最大批判者，長年只負責歌曲的饒舌部分與合聲，甚至認為自己的歌聲只是「功能性」","，不把自己歸類在歌手。","後來被前一任主唱 Chester 大力鼓勵下，才逐漸開始在樂團的部分歌曲裡擔任主要歌唱部分。","與饒舌時的霸氣強悍風格不同，唱歌時的歌聲是溫柔甜美系的⋯無法唱嘶吼腔（其實他不是沒有嘗試過但似乎很抗拒）","。"]},
+{id:5,name:"童年學習歷程",arch:"D",sub:"從古典鋼琴到嘻哈製作，再到藝術中心設計學院",imgs:3,body:["Mike的媽媽從6歲就讓他開始學習古典鋼琴，但之後迷上了嘻哈樂。","13歲時詢問音樂老師該如何製作嘻哈音樂，老師告訴他這不是他的專業，也許可以買個電子琴自行學習，於是Mike買了電子琴與採樣器自己嘗試製作MIDI與數位音樂。","16歲時開始用四軌錄音機製作饒舌小樣，說自己是靠製作混音來學習音樂製作的。","高中時參與學生會工作，常在周五午餐時間用學校廣播唱freestyle。","Mike從小就喜歡畫畫，沉迷電玩是他對繪畫熱愛的起點：「每天放學後，我會馬上完成作業並投入洛克人、超級瑪利歐兄弟、銀河戰士的懷抱。"]},
+{id:6,name:"童年學習歷程",arch:"B",sub:"",imgs:3,body:["除了玩遊戲，我也會拿起紙筆自己替這些遊戲構思新角色。","」","後來迷上採樣技術後，就結合兩種喜好開始繪製專輯封面。","原本打算以畫圖維生，音樂只是興趣，結果最終決定認真經營樂團。","大學就讀出了名難考的藝術中心設計學院（Art Center College of Design）","，並在那裡認識了樂團DJ Joe Hahn。","當初畢業前夕樂團拿到唱片公司合約，但Mike媽媽懇求他讀完剩下幾個月（學費很貴）","，所以他乖乖讀完畢業了。","Mike曾表示，能努力完成課程並畢業是他最引以為傲的事情之一。"]},
+{id:7,name:"美術作品風格",arch:"C",sub:"與Joe共同監修樂團所有視覺設計",imgs:6,body:["以深厚的美術經驗和Joe一起負責監修所有樂團的相關設計（hybrid theory封面的士兵就是Mike畫的）","。","畫風兼具圓滑可愛與時尚感，擅長描繪卡通風格的人物與幾何造型堆疊，也十分擅長街頭噴漆畫與POP手寫字。"]},
+{id:8,name:"樂團初期組建史（Xero）",arch:"D",sub:"從Relative Degree到Xero，再到Linkin Park",imgs:2,body:["Mike在學生時期就認識Brad、Rob、Mark，他們三個組了一個叫Relative Degree的樂團，Mike並沒有加入，但經常去看排練。","高中畢業後1996年他與Brad(吉他手)、Mark Wakefield(主唱)、Rob(鼓手)一起創立了樂團Xero(LP的前身)，後來又招募了Dave(貝斯手)、Joe(DJ)。","「我們用Xero這個名字是因為我們覺得它看起來很酷」","。"]},
+{id:9,name:"樂團初期組建史（Xero）",arch:"B",sub:"",imgs:2,body:["後來Mark轉去幕後工作離開了樂團，Mike只獨自擔任了主唱大約兩個月：「演出的時候，我會找朋友來唱其他部分。","不過很奇怪，我寫歌的時候，腦子裡總是想著需要兩個人一起唱，我覺得這樣能為歌曲增添一種獨特的深度和氛圍。","」","Mike不想要自己一個人唱歌，所以開始招募新的主唱，1999年Chester通過試鏡進入樂團，後來改名為Hybrid Theory，與唱片公司簽約後又改了一次名，最終變成了Linkin Park。"]},
+{id:10,name:"Fort Minor 副企劃",arch:"B",sub:"2005年推出，回歸嘻哈根源的個人企劃",imgs:2,body:["2004年12月，Mike說他們正在調整節奏著手其他項目，想給歌迷帶來不同的作品。","2005年時他透露自己錄製了一張個人專輯，由Jay-Z擔任執行製作。","最終在6月時Mike基於他對嘻哈音樂的喜愛，推出了Fort Minor(黑暗堡壘)這個副企劃，旨在回歸嘻哈音樂的根源。","Mike幾乎包攬了專輯中所有音符的創作和演奏，並邀請了他在嘻哈圈的朋友們參與製作。"]},
+{id:11,name:"創作流程與歌詞理念",arch:"D",sub:"Mike與Brad作曲，與Chester填詞",imgs:2,body:["Linkin Park的創作流程通常是Mike跟Brad一起創作音樂作曲後，Mike再寫下人聲部分，與Chester一同填詞，接著交給其他成員提出意見或修改。","Mike形容他們的創作方式更像一個嘻哈音樂創作團隊。","Mike能跟Chester創作最好的歌詞，是因為他們能毫無顧慮地討論歌詞各部分及含義，重點永遠放在『哪一段最好』，而不是『誰寫的』。"]},
+{id:12,name:"創作流程與歌詞理念",arch:"B",sub:"",imgs:2,body:["Chester：「我不能只是把我發生的破事寫出來然後指望他能唱得出來。","歌詞必須保持足夠的抽象與通用性，讓我們兩個都能認同並產生共鳴。","」","Mike補充：「我們的歌詞比大多數樂團都更內向、更內省，我們真的不是那種『我要扁你/去你的』類型的樂團。","」"]},
+{id:13,name:"Chester離開後的傷痛",arch:"D",sub:"樂團完全停擺，Mike一度想放棄音樂",imgs:4,body:["Chester離開後，樂團成員承受莫大的傷痛，所有活動停擺，Mike完全破碎，他當時完全聽不了樂團的歌，只要聽到就會崩潰的程度，甚至有了放棄音樂的想法。","後來經過一陣子，Mike希望自己能夠「好起來」","，察覺讓焦慮好轉的方法是直接面對傷痛，也就是聽樂團的歌。","Dave給了Mike很大的鼓勵：「我做到了，你沒問題的，兄弟，你一定也辦得到。","」"]},
+{id:14,name:"Chester離開後的傷痛",arch:"B",sub:"",imgs:4,body:["Mike離開Dave家後，在車上試著打開了樂團的歌，努力撐著聽完了。","Mike：「如果你身邊有人有跟你一樣的經歷，那真的會非常有幫助。","我特別提到Dave，是因為在職業生涯後半段，大多數時間都是我、Dave、Chester一起旅行，幾乎形影不離。","而在這個『共享現實』的距離之後，是其他樂團成員；再往外退一公里，就是除此以外的所有其他人——他們無法真的理解那是什麼樣的經歷。","」"]},
+{id:15,name:"Chester紀念致敬演唱會",arch:"C",sub:"2017年10月27日",imgs:3,body:["之後Dave提議他們應該辦個演唱會紀念Chester，紀念他們的朋友。","最終幾個月後，2017年10月27日，樂團邀請了其他與LP熟識的樂團朋友與音樂人們，一同舉辦了Chester的紀念致敬演唱會。","之後的7年，雖然樂團偶爾會推出過去未公開的曲目跟Demos，但Linkin Park作為樂團不再創作及巡演活動。"]},
+{id:16,name:"《Over Again》與 Post Traumatic",arch:"D",sub:"排練時重新學習所有歌曲，促使Mike寫下歌詞",imgs:3,body:["當樂團在為Chester的致敬演出排練時，他們不得不在沒有Chester的情況下重新學習所有歌曲的進行方式。","排練時不斷被提醒Chester已經不在的事實，促使Mike寫下了《Over Again》這首歌，歌詞內直白地描述了當時Mike極端悲痛的情緒。"]},
+{id:17,name:"《Over Again》與 Post Traumatic",arch:"B",sub:"",imgs:3,body:["Mike在致敬演唱會期間寫下並錄製了第一段歌詞：「我非常害怕那場演出，因為我在想，我可能隨時都會被現在所發生的事情壓垮，無法繼續表演。","這表演有數十位來賓，數百萬人觀看；我不想讓大家失望。","」","2018年，Mike把從絕望到逐漸走出來的過程錄製成了《Post Traumatic》這張專輯，他也表示理解保持真實和不自我審查的重要性，因為他透過音樂來幫助自己度過悲傷。"]},
+{id:18,name:"個人專輯發行理由",arch:"D",sub:"以本名發行的緊張與掙扎",imgs:1,body:["被問到為什麼選擇以自己的本名發行這張專輯，Mike表示悲傷是非常個人的體驗：「在Chester離世一週後，『錄音室』這個概念令人感到害怕。","這不僅僅是會被那些回憶淹沒的問題。","對於處於這種情況下的創作者來說，還有另一層恐懼是：『如果我沒有了那個人就再也寫不出好東西了怎麼辦？","』這些阻礙開始不斷堆積，無論是恐懼、憂鬱，還是外界混亂帶來的困擾，都會形成一個焦慮的迴音室。","對我來說，那時我必須做點東西出來——管它能不能用都不重要。","我寫了一些很爛的90年代油漬搖滾，寫了很爛的說唱歌曲…","…","然後我寫出了一首好作品。"]},
+{id:19,name:"個人專輯發行理由",arch:"B",sub:"",imgs:1,body:["我創作這一切時壓根沒打算公開發行，就只是單純投入到腦海中早已浮現的某些靈感裡。","」","所有團員都非常支持他發行這張個人專輯：「我心裡其實非常緊張，而他們給予的支持比我想像的還要多。","我覺得自己能感覺出他們到底是真心支持還是敷衍。","順帶一提，我欣賞Chester的一點就是他不太會這樣，如果他不喜歡什麼，他會直接告訴我，除了我之外，他是團裡最直來直往的人。","但說真的，當我告訴大家『聽著，我想做一張個人專輯』時，他們的接受度非常高，我看得出那是坦誠且積極的反響。","」","之後Mike自己一個人演奏大部分樂器，走遍了世界進行個人巡演，替粉絲療傷。"]},
+{id:20,name:"Twitch 直播時期",arch:"C",sub:"疫情期間開始的Wombat直播生活",imgs:6,body:["個人巡演結束後，Mike維持了一段時間的solo活動。","剛好遇上新冠疫情，大家不得不關在家裡，約在這時期開始了在Twitch上直播的生活。","他會直播製作音樂、畫圖、玩遊戲，直播時的觀眾名字是Wombat(袋熊)，會應粉絲要求在直播上即興製作曲目、畫圖等。"]},
+{id:21,name:"Twitch 直播時期",arch:"B",sub:"",imgs:6,body:["這時期也與粉絲們協作合唱了《Open Door》這首歌曲，並發行了《Dropped Frames》系列共3集，收錄了直播時與觀眾一起製作的無人聲曲目，開放大家免費作為BGM使用。","期間Mike也作為製作人替許多藝人製作歌曲，但對於自己當主唱的歌曲卻一直保持低調，直到2023年才帶著單曲《In My Head》回歸，接著同年10月推出了《Already Over》。"]},
+{id:22,name:"《In My Head》回歸單曲",arch:"C",sub:"2023年正式回歸個人主唱作品",imgs:3,body:["繼《Already Over》發行前的首支回歸單曲，也是Mike多年低調製作生涯後，重新以自己聲音為核心的重要轉捩點。"]},
+{id:23,name:"個人歌聲信心建立",arch:"B",sub:"2019/2020年才明白自己聲音的可能性",imgs:3,body:["Mike談到這首歌的誕生過程：「過去幾年裡，我一直在為其他人寫歌和做製作。","直到某個時刻我才意識到：『好吧，我做了這麼多事，卻一直在刻意迴避親自站上麥克風前，把所有注意力都放在別人的作品上。","』我意識到，自己很懷念那種為了自己的聲音去投入計畫並深掘其中的藝術成就感。"]},
+{id:24,name:"個人歌聲信心建立",arch:"B",sub:"",imgs:3,body:["而且，我從不覺得自己算是一個稱職的歌手，我雖然會唱歌，但那比較像是功能性的，比如為了寫歌、唱和聲。","」","「直到2019或2020年左右我才明白，如果我從一開始就是以『自己要唱』為前提來寫一首歌，我可能會對自己的聲音有全新的發現。","而事實也完全證明了這一點。","」","Mike不僅逐漸建立起將自己歌聲放在核心位置的自信，他還在同樣的努力中協助並啟發了許許多多的人。"]},
+{id:25,name:"100小時倒數直播事件",arch:"B",sub:"2024年底的神秘倒數計時，倒數歸零後又向上計數",imgs:1,body:["接著到了2024年底，Linkin Park突然發出了一個100小時倒數的直播影片，沒有人知道這是什麼，Joe在留言問說這是什麼？","Mike說不知道，要去問Dave跟Brad。","倒數第一次歸零時大家都很緊張，結果一歸零後⋯開始從0又往上計數了！","！","(自此所有LP粉絲都患上了對於倒數的PTSD)"]},
+{id:26,name:"9/5 回歸活動預告",arch:"C",sub:"計數器故障暗示日期，正式宣布回歸",imgs:1,body:["計數器在9:05時出現故障，暗示了9/5，接著在向上計數的100小時結束後，官方發布了一則訊息指出在9/5會有活動。","而那個活動就是Linkin Park回歸的那一天。"]},
+{id:27,name:"Dave \"Phoenix\" Farrell / 戴夫法雷爾",arch:"A",sub:"1977年2月8日．貝斯手",imgs:8,body:["穩重且親切隨和，講話輕鬆，喜歡搞笑與惡作劇。","時常會捉弄人，在台上只要是能自由走動的團員他大多不會放過，但捉弄首選是Mike，偷走Mike麥克風架上的pick或是在他饒舌時摸他的頭，偷偷在表演時靠到旁邊之類的族繁不及備載。","這也促使Mike在舞台上有足夠的舒適度去頻繁靠近捉弄Dave。"]},
+{id:28,name:"訪談風格與鏡頭喜好",arch:"C",sub:"早期樂團的搞笑輸出擔當",imgs:5,body:["訪談時也喜歡講各種有趣的笑話，在樂團早期的訪談中不遺餘力地輸出搞笑。","他曾在訪談自稱受過喜劇演員的訓練但不知道是真的還是假的（因為他們太愛講幹話了）","。","Dave還很喜歡親攝影機鏡頭，LPTV等時常能看到他親鏡頭的畫面。","有個隱藏特殊技能是拍照會一直閉眼，Meteora時期有幾張海報上Dave的眼睛都是後期Photoshop補上去的，因為照片太完美但唯獨Dave閉眼了…","（但他們沒具體說過是哪幾張）"]},
+{id:29,name:"刺青與胎記",arch:"C",sub:"與Mike共同設計的背後鳳凰刺青",imgs:3,body:["不菸不酒不毒，但雙臂與背後都有刺青，背後的鳳凰刺青是他跟Mike一起共同設計的，知道這個刺青的人並不多（僅在樂團早年的寫真集提及過）","。","肚子上有一個胎記。"]},
+{id:30,name:"高爾夫與健身",arch:"B",sub:"每週固定球場活躍，泡冰浴健身夥伴",imgs:5,body:["非常喜歡運動，尤其是高爾夫球，除了樂團表演外也在高爾夫球場上很活躍，會作為選手參賽。","在家的時候每周打兩到三次，樂團巡迴時如果天氣允許，每周會打一到兩次。","在2001年的Family Values Tour巡迴演出中，他開玩笑地在Deadsy表演時在舞台上打高爾夫，還選了Mike當他的球童。","也有在健身，新鼓手Colin稱Dave是他的健身指導教練，兩人常一起運動，或在演唱會後一起泡冰浴。"]},
+{id:31,name:"音樂訓練背景",arch:"D",sub:"從小提琴到大提琴，最終成為貝斯手",imgs:4,body:["高中時他的母親教導他學習吉他的基礎，並在幾年之後加入了斯卡龐克樂團The Snax，為了配合樂團需要從吉他過渡至貝斯，成為了貝斯手。","在這時有了「Phoenix(菲尼克斯)」","的綽號，早期只使用Phoenix這個名字來稱呼，被叫本名反而顯得有點尷尬，但後期反而是反過來，幾乎不太使用Phoenix而是使用本名Dave（可能年紀大了不好意思繼續使用中二名字了）","。"]},
+{id:32,name:"音樂訓練背景",arch:"B",sub:"",imgs:4,body:["Dave從一年級開始學習拉小提琴，接著接受了八年的古典音樂訓練，學習了大提琴與中提琴（他也在Linkin Park的演唱會上拉過大提琴!）","。","大學時主修生物學(醫學預科)，最終卻以哲學系畢業，輔修古典希臘文，而後在大學時與Linkin Park的吉他手Brad Delson結識成為室友，並於1997年參與了Linkin Park的Demo製作，成為樂團裡的貝斯手。"]},
+{id:33,name:"缺席首張專輯與回歸趣事",arch:"B",sub:"因原樂團巡演承諾而暫時離團",imgs:5,body:["在Linkin Park正式商業出道前，由於已經與原樂團The Snax約定好要一同去巡演，不得不暫時離開Linkin Park，因此發行第一張專輯《Hybrid Theory》時Dave並不在團裡。","雖然未出現在最一開始的專輯主視覺，但回來後有陸續參與混合理論的MV拍攝並一起巡演。","Dave離團時，Mike每隔幾天就會一直盧Brad跟Rob去問Dave要回來了沒，Dave開玩笑說「那我以後表演都全裸只穿洞洞鞋可以嗎？","」","Mike跟Brad都說「如果是你的話都可以啦」","（※他並沒有這樣穿過）"]},
+{id:34,name:"樂團內的「調和者」",arch:"B",sub:"「樂團爸爸」的稱號",imgs:3,body:["由於輕鬆隨和的個性，Mike稱其為樂團內的「調和者」","，指出Dave總是知道如何讓人放鬆，只要有他在，就算再艱難的狀況也能讓大家緩和情緒去面對。","樂團的新成員Emily稱其為「樂團爸爸」","，從他的觀察裡，Dave總是在守護照顧著大家（Mike聽到這稱呼時愣住了幾秒喃喃說「我從來沒這樣想過」","，顯然是一直以來被照顧得很好但沒注意到自己其實被照顧著）","。","對自己的玩笑大多都能笑笑帶過，但他說要是看到其他樂團成員被攻擊就會非常生氣（也許這是他原本活躍網路但現在完全不上網互動的原因）","。"]},
+{id:35,name:"對Mike的情感支撐",arch:"B",sub:"樂團停擺期間最密切的互動",imgs:3,body:["Chester過世時，Dave關心安撫Mike的電話留言被收錄在《Place to Start》這首歌的尾段，可以看出Dave為了安撫Mike選擇先擱置了自己的悲傷，集中在安撫崩潰的Mike。","團員們因悲痛都對音樂產生抗拒感時，第一個試著回去接觸音樂並鼓勵大家的是Dave，提議為Chester舉辦紀念演唱會的也是Dave。"]},
+{id:36,name:"對Mike的情感支撐",arch:"B",sub:"",imgs:3,body:["在樂團停擺期間，Dave與Mike維持了最密切的互動，開了一個Podcast節目兩度邀請Mike；Mike在Post Traumatic巡演期間也三度邀請Dave同台。","Dave在訪談指出這期間他經常特地開車到Mike家待6個小時，甚至不是為了做音樂只是為了跟他聊天。"]},
+{id:37,name:"Joseph \"Joe\" Hahn / 喬瑟夫．韓",arch:"A",sub:"1977年3月15日．DJ、視覺藝術、MV導演",imgs:6,body:["愛稱Mr.Hahn(韓先生)。","個性可以說是樂團裡面最電波的成員，常常超激昂跟超冷漠的表情瞬間切換，其難以捉摸程度時常讓人覺得是不是有在吸，感覺像藥在走(?)(他沒有吸過毒)。","有時會在訪談時裝成一動不動的雕像或是直接坐在中間裝睡，訪談人詢問樂團成名後有沒有決定開始做榜樣的事情，Joe回答「我不再殺人了」","。","早期還喜歡對攝影機露屁股蛋(?)。","通常Joe開始發作(?)之後團員就會跟著被牽動一起開始不正經的已讀亂回。"]},
+{id:38,name:"隨年紀增長的電波個性變化",arch:"B",sub:"還算會講一些韓文",imgs:3,body:["但隨著年紀增長，Joe的瘋癲特質沒有以前那麼誇張了，雖然偶爾還是會講一些奇怪冷笑話（個人覺得次數減少非常之可惜XD）","。","跟一樣是亞裔的Mike不同，還算是會講一些韓文(?)"]},
+{id:39,name:"體型變化與模特兒美照",arch:"C",sub:"「韓胖」到瘦身奇蹟",imgs:2,body:["因為體型所以被部份粉絲愛稱韓胖，但在樂團停止活動的期間有一段瘦到不可思議的時間…","還拍了過去沒拍過的模特兒奇蹟美照…"]},
+{id:40,name:"藝術背景與訓練",arch:"B",sub:"與Mike同校卻因學費休學",imgs:4,body:["就像Mike跟Dave一樣，Joe也接受過古典音樂的訓練，拉了幾年小提琴，然後又學了一陣子的吉他，直到上高中後才開始投注心力做DJ。","他跟Mike在大學認識，也是藝術中心設計學院的學生，兩人有著相似的音樂興趣，尤其是嘻哈音樂。","但Joe因為付不起學費，讀了一年就休學去工作了。","Joe在這期間從事特效設計師跟插畫家的工作，主要負責影視的分鏡繪製與腳色設計，參與了《X檔案》、《第九空間》、《地心駭客》等作品的製作。","雖然跟Mike一樣是畫圖的但畫風非常不同，Joe的畫風更寫實細長並更擅長用線條刻畫細節。"]},
+{id:41,name:"加入樂團與MV導演之路",arch:"C",sub:"從有趣參與到親自執導",imgs:4,body:["幾年後，Mike邀請Joe加入樂團。","Joe除了在舞台上作為DJ搓碟演奏採樣，沒有表演部分時，他會拿著相機或手機在舞台上到處移動穿梭拍攝團員與觀眾，後來也陸續導演了一些電影與其他歌手樂團的MV。"]},
+{id:42,name:"MV導演作品集",arch:"C",sub:"《Unshatter》也是Joe親自執導的作品",imgs:6,body:["Linkin Park的MV製作一開始Joe只是因為覺得有趣所以參與，但後來覺得為了展現樂團成員們更自然真實的風貌，必須由他來親自執導，因此樂團的MV絕大部分都是由Joe負責執導的。","本次的電影《Unshatter》也是由Joe親自執導的作品。"]},
+{id:43,name:"促使樂團回歸的一大推手",arch:"D",sub:"與Mike的一次早餐對話",imgs:2,body:["樂團沉寂了幾年後，Joe搬去了夏威夷，變得比較少聯絡，但某天Joe主動約了Mike吃早餐，討論了關於樂團繼續運作的話題，Joe表示很希望能跟樂團再一起玩。","Mike提出假設：「如果樂團只能以非常小規模繼續運作，像是所有人只能共享一輛麵包車旅行，只能在音樂節的中場作演出也可以嗎？","」","Joe的反應是：「當然可以啊，我會很喜歡。"]},
+{id:44,name:"促使樂團回歸的一大推手",arch:"B",sub:"",imgs:2,body:["」","同時繼續講述與團員大家共度時光以及創作偉大作品的意義，這讓Mike認真審視讓樂團回來這件事。","跟Joe講完後，Mike馬上也很興奮的跟Dave分享了這段對話，這使他們決定開始花更多的時間待在一起。","Mike：「即使我們什麼音樂都不玩，只是坐在一起做白日夢也可以。","」","所以Joe是促使樂團回歸的一大推手。"]},
+{id:45,name:"Brad Delson / 布萊德·達爾森",arch:"A",sub:"1977年12月1日．吉他手",imgs:5,body:["表演時總是帶著耳罩式耳機，通常還會搭配著爆炸頭(但有時會剃掉)，是他的標誌型外觀。","他的耳機主要是為了保護他敏感的聽力而非只是單純的造型。","個性上可以說是僅次於Joe的電波程度，但又更偏向毒舌+難搞一點，平常話不多但只要一開口就經常語出驚人，屬於如果可以外耗絕不內耗的類型(?)。","由於直言不諱的個性被粉絲愛稱為Big Bad Brad(他的簽名也是寫BBB)。"]},
+{id:46,name:"簽名會與訪談中的毒舌",arch:"B",sub:"配合Chester能達到極度混沌的效果",imgs:4,body:["像是樂團的簽名會由於粉絲數量超出預期導致嚴重超時，其他團員都堅持替所有粉絲繼續簽完時，Brad卻表示只想趕快回家XD。","又或者在訪談時訪談人讓他不開心，他就會開始整段訪談已讀亂回話中帶刺。","如果Mike在的話通常會努力挽回，但如果配合的訪談成員是Chester將可以達到場面極度混沌的效果（因為Chester愛玩鬧的個性會決定順著Brad步調走）","。","順帶一提Brad雖然無法忍受噪音才戴著耳機，但他可以接受Chester在他耳邊大吼大叫…"]},
+{id:47,name:"童年組樂團經歷",arch:"B",sub:"從管弦樂隊小號手到組建The Pricks",imgs:3,body:["Brad小學時在管弦樂隊吹小號，之後學了5年的吉他後也開始教吉他，並跟好友一起在當地樂團表演。","他在高中時認識了Mike以及Mark，這時第一個樂團是The Pricks，另一個團員是Mark。","後來Brad透過當地樂團Karma的貝斯手Dave Garrett，認識了LP的鼓手Rob，結合目前結識的成員又組成了一支名為Relative Degree的樂團。"]},
+{id:48,name:"童年組樂團經歷",arch:"B",sub:"",imgs:3,body:["Mike從來沒有加入過Brad組織的這些樂團，但偶爾會在他們的歌曲中加入採樣，並觀看排練。","高中畢業後，Mike跟Mark一起組了「Xero」","這個樂團。","一開始只是Mike為各種嘻哈藝人製作伴奏，但後來邀請了Brad來幫忙，Brad在一張包含四首歌的demo中錄製了幾首歌的吉他部分。","他們把demo寄給了某家獨立唱片公司後，公司大讚其專業度並鼓勵他們組織樂團，樂團就從這裡開始認真起來了。"]},
+{id:49,name:"促成華納簽約的關鍵人物",arch:"B",sub:"透過Jeff Blue的課程積極爭取",imgs:3,body:["Brad在大學一年級時去聽了Jeff Blue(多家大型唱片公司和音樂總監的音樂顧問)的課並積極爭取，最終成為實習生，這也促使後來Jeff協助他們向華納簽約。","後來Mark離開，Chester加入，樂團仍然持續吃閉門羹，最終在Jeff當上華納唱片的A&R部門副總裁後，於2000年簽下了LP(在這之前樂團已經被華納拒絕了3次)。","因此LP最終能夠商業出道，Brad可以說是功不可沒。"]},
+{id:50,name:"三年閉門羹的唱片公司拒絕史",arch:"B",sub:"賄賂音響師也未能成功",imgs:2,body:["三年來樂團積極把Demo寄給願意聽的人，但卻被所有主流唱片公司跟獨立廠商拒絕，因為樂團的歌曲難以用單一標籤定義。","在某場有超過30位業內星探的展示會上，Brad甚至花錢賄賂音響師讓他們的聲音聽起來好聽一點（但最終沒有成功）","。"]},
+{id:51,name:"樂團回歸後的參與度",arch:"B",sub:"從抗拒到寫出更重的歌",imgs:4,body:["一開始樂團要回歸時，其實Brad有點抗拒，但Mike、Dave、Joe勸說他也可以只是參與看看，至少來一次跟Emily還有Colin的創作會議。","結果他非常喜歡並馬上投入，甚至說：「我覺得我們可以寫些更重的歌曲。","」","隨後《Casualty》這首歌便誕生了。","樂團回歸後，Brad宣布他將不再參與樂團的現場演出，但會繼續擔任錄音室吉他手。"]},
+{id:52,name:"樂團回歸後的參與度",arch:"B",sub:"",imgs:4,body:["Mike表示：「巡迴其實不適合Brad的個性。","雖然他以前喜歡，但隨著年齡增長，他已經開始厭倦巡演的喧囂、混亂以及奔波於各個城市之間的生活。","」","巡迴吉他手Alex Feder在他缺席期間擔任現場代打。","雖然Brad不上台表演，但有時還是會跟著巡迴旅行只待在後台；在From Zero巡演的最後一站蘇黎世，Brad主動上台跟所有團員一起拍了合照。"]},
+{id:53,name:"Chester Bennington / 查斯特·班寧頓",arch:"A",sub:"1976年3月20日–2017年7月20日．前主唱",imgs:5,body:["樂團的開心果，十分愛玩鬧且活潑好動。","據Joe所說如果不去特意阻止，他將會沒完沒了地持續逗你笑一整天，但同時他跟Brad一樣也十分心直口快毒舌。","喜歡玩鬧搞怪的個性讓他跟喜歡搞笑的LP團員們一拍即合，直來直往的個性讓他在樂團與外部有衝突時總是第一個衝出去嗆聲的人。"]},
+{id:54,name:"Chester Bennington / 查斯特·班寧頓",arch:"B",sub:"",imgs:5,body:["如樂團行車時遇到衝突會下車去罵人，或是在網路上樂團被攻擊質疑時也會直接嗆回去。","《One More Light》這張專輯與樂團過去曲風大相逕庭，所有人都收到了許多攻擊跟反對的聲音，其他團員大多選擇忽視，但Chester反擊並直接發文說「我就喜歡封鎖人」","，是樂團裡個性相對潑辣的人。"]},
+{id:55,name:"對網路攻擊的態度",arch:"D",sub:"「I ❤ Blocking people」",imgs:1,body:["面對批評與攻擊，Chester從不隱藏自己的情緒，直接在社群上表明自己享受封鎖惡意留言者的過程，展現出樂團裡少見的直率反擊風格，也讓他成為團員與外界衝突時第一個站出來的人。"]},
+{id:56,name:"溫柔面與遊戲喜好",arch:"B",sub:"疼愛孩子的父親，笨拙的遊戲玩家",imgs:4,body:["但同時Chester也有十分和善溫柔的一面，他毫不掩飾表現自己對樂團及樂團成員、以及支持樂團粉絲們的喜愛，也很樂意與粉絲進行深度交流互動，看到行動有困難的粉絲會特地上前關心。","他也是十分疼愛孩子的父親，總是花很多時間陪伴老婆與小孩。"]},
+{id:57,name:"溫柔面與遊戲喜好",arch:"B",sub:"",imgs:4,body:["不太擅長玩遊戲，過去樂團會在巡迴巴士上一起玩Halo，Mike邀請Chester一起遊玩但由於完全不懂如何操作導致在原地轉圈圈的情況下慘敗，但後來技術有所進步，迷上了《皇室戰爭：部落衝突》跟《Let It Die》。","用電腦打字的時候也是一指神功派(?)，過去樂團有個粉絲團專用聊天室，但Chester打字太慢完全跟不上聊天室洗版的速度。"]},
+{id:58,name:"童年歌唱訓練與Ministry啟蒙",arch:"D",sub:"用錯誤方式練出獨一無二的唱腔",imgs:4,body:["Chester從他會說話起，就告訴身邊所有人他長大後要當歌手。","他的哥哥常播放Foreigner樂團的唱片，Chester從兩歲時就常跑來跑去唱他們的歌。","但他說在訓練歌喉時他長期以來完全使用了錯誤的方式：「我基本上就是一直硬唱、一直硬練，直到我的喉嚨不再感到疼痛為止。","我想這是我的一種天賦。","」"]},
+{id:59,name:"童年歌唱訓練與Ministry啟蒙",arch:"B",sub:"",imgs:4,body:["他最喜歡的樂團是Ministry，總是在不使用任何效果器的狀況下盡力模仿Al Jourgensen經過高度製作/壓縮的嗓音，雖然學習過程並不正統，但他幸運地擁有極具韌性的聲帶結構，在經過長時間的錯誤練習後反而鍛鍊出獨一無二的唱腔。","在學校他開始接觸音樂劇與學習演奏樂器，並在全國巡迴演出舞台劇。","Chester有位吉他彈得不錯的朋友當時正想找主唱，Chester當下便自告奮勇加入他，隨後兩人闖入了一間位於民宅後方的教堂，偷了隻麥克風，就這麼一起玩起了音樂。"]},
+{id:60,name:"童年歌唱訓練與Ministry啟蒙",arch:"B",sub:"",imgs:4,body:["這也讓他結識了一些其他年輕的音樂人，Chester在這時認識了Sean Dowdell，並進入了他的第一支樂團Sean Dowdell And His Friends?(問號是團名的一部分)。","一開始樂團並未打算認真經營，但很快擁有了一群粉絲後便開始積極宣傳並錄製原創歌曲，然而Chester經常排練遲到，並且在學校吸毒，他的父親因此對他下了禁足令，這嚴重影響了樂團的運作，後來樂團找了其他代打歌手撐了一陣子。","Chester終於回來後，樂團卻也已經走到了盡頭，最終解散。"]},
+{id:61,name:"Grey Daze 與 Waterface",arch:"B",sub:"因唱片公司商業決定離團",imgs:3,body:["樂團解散後不久，Sean Dowdell馬上又集結其他人馬組了一隻新樂團，也就是Grey Daze，經過與幾位歌手的磨合嘗試後，最終樂團選擇讓Chester加入成為主唱，後來樂團持續不斷演出，逐漸變成當地家喻戶曉的樂團。"]},
+{id:62,name:"Grey Daze 與 Waterface",arch:"B",sub:"",imgs:3,body:["但在1998年下半年，樂團成員間衝突不斷，而Sean不願Chester接觸樂團任何商業面的決定，使Chester決定離開樂團，Sean表示Chester離開的話他就會找別的女歌手來頂替他（這個發言經過Chester母親的錯誤轉述，導致一些報導誤會並主張這是Mike的發言）","。","之後Chester離開，Sean找了女歌手Jodi Wendt頂替，樂團更名為Waterface。"]},
+{id:63,name:"Linkin Park 團名由來",arch:"D",sub:"從Hybrid到林肯公園的同音改名",imgs:3,body:["Xero由於主唱Mark Wakefield決定離隊轉為幕後工作，樂團開始尋找新主唱，Chester從Jeff那邊拿到了Xero的Demos，聽了後馬上離開自己的生日派對去錄製了Demo，幾天後前往洛杉磯試音，最終進入了樂團，Chester加入後樂團改名為Hybrid Theory並發行了EP。","但與唱片公司簽約後，由於公司旗下已經有一支樂團名叫Hybrid，他們不得不改名，經過許多名字提案，Chester在開車經過家裡附近的林肯公園時突發奇想說「還是我們就叫這個名字好了？"]},
+{id:64,name:"Linkin Park 團名由來",arch:"B",sub:"",imgs:3,body:["」","最終這成為30個提案裡唯一團員們都喜歡的名字。","Brad提議應該要拿這名字註冊網域，結果發現要1萬美元，所以把名字從\"Lincoln\"改成同音的\"Linkin\"來註冊網域，Linkin Park(聯合公園)就這樣誕生了。","過去的記者會上樂團被詢問團名的意義，Joe表示原本Hybrid Theory對樂團來說是非常有意義的名字，但不得不換，現在Linkin Park這名字本身沒有任何背後含意。"]},
+{id:65,name:"唱片公司施壓事件",arch:"B",sub:"要求Mike「當純鍵盤手要麼滾蛋」",imgs:4,body:["樂團在營運上遭受到了處處刁難，唱片公司對樂團未來的方向出了各種奇怪的主意，希望樂團放棄饒舌的部分轉為純搖滾樂團，並希望Mike要麼當個純鍵盤手要麼滾蛋（這些狀況後來被Mike寫在《Get Me Gone》這首歌裡）","。","Chester第一個先被私下告知了公司的這件決定，這讓Chester十分錯愕，並堅決拒絕公司的提議：「我才來這裡四個月而已，這甚至都不是我的樂團，要不是Mike決定不想唱歌，我人根本不會在這裡。","」","後來Chester把公司的提議告訴給了其他團員，原本大家聽了很緊張，聽到了Chester的回答後才放下心來，這也更加凝聚了樂團的向心力。"]},
+{id:66,name:"成癮問題背景",arch:"D",sub:"為逃離童年性侵虐待回憶的酗酒與用藥",imgs:3,body:["然而，由於小時候遭受長達6年的性侵與虐待，為了逃離痛苦的回憶，Chester長年來有非常嚴重的酗酒與用藥問題。","這些不良習慣是Mike在試鏡時擔心Chester是否適合加入樂團的原因，因為他與其他成員的生活型態與習慣完全不同。","加入後，在樂團的長途疲倦巡迴旅行中，Chester有時會偷跑出去並醉醺醺地回來，醉酒當下的Chester很有趣很搞笑，會跟大家一起玩得很開心，但一到隔天，宿醉的Chester就會開始變得異常憤怒，對身邊所有人大吼大叫，這種時候團員只能讓他先自己靜一靜。"]},
+{id:67,name:"成癮問題背景",arch:"B",sub:"",imgs:3,body:["團員們當時還很年輕，對剛出道卻馬上爆紅的狀況措手不及，再加上當時有爆滿的巡迴行程，這讓樂團在早年並沒有太多餘力處理Chester的狀況。","Mike：「那時候的我們就是一群二十出頭的年輕人，第一次遇到這麼多酷事情。","對我來講，你說的那些更沉重的東西(Chester的狀況)，可能在當時被這個狀態『分散』掉了。","我們會覺得，哇，我們正在被帶離那些痛苦，進入一個很棒的夢裡。","因為這就是我們一直想要的：做這件事。","我們原本只是想好玩做音樂，但現在我們竟然可以靠這個維生。","」"]},
+{id:68,name:"2005年戒酒與心理諮商",arch:"D",sub:"「我當時面臨戒酒和死亡之間的選擇」",imgs:4,body:["2005年，Chester面臨與前妻Samantha的離婚問題，加劇了憂鬱症狀，又再次開始酗酒吸毒，最終樂團內部因Chester的酗酒問題而產生的緊張關係在2006年達到了爆發點。","「我當時面臨戒酒和死亡之間的選擇」","Chester說。","樂團決定與Chester溝通，並大家一同去做了心理諮商，敞開了彼此的心扉深度交談。"]},
+{id:69,name:"2005年戒酒與心理諮商",arch:"B",sub:"",imgs:4,body:["「他們說我簡直是兩個人，一個是Chester，另一個則是『那個該死的傢伙』，我不想成為那個傢伙。","」","這讓Chester醒悟並開始認真檢視自己的酗酒與用藥問題，講開後團員之間也產生了更親密的聯繫。","Chester說：「我們不是那種人人嗑藥的俗套搖滾樂團，我們都是很正派的人，我以此自豪。","」"]},
+{id:70,name:"與Mike的絕佳默契",arch:"D",sub:"「我跟其他人相處的時間，都沒有比跟Chester多」",imgs:4,body:["作為樂團的兩個主唱，Mike跟Chester有著絕佳的默契。","為了一起共同創作歌詞，兩人一開始就坦承相對，分享了彼此的過去與挫折感，因此Mike自然而然成為了樂團裡Chester最早坦承自己痛苦過去的人。","他跟Chester幾乎形影不離：「我跟其他人相處的時間，都沒有比跟Chester多。","」","Mike說。","「在我們職業生涯的後半段，我絕大多數的行程都是我、Dave和Chester三個人在一起，我們總是一起坐廂型車、一起坐車、一起搭飛機…","…","」"]},
+{id:71,name:"副企劃：Dead by Sunrise 與 STP",arch:"D",sub:"「Mike創造了我們最標誌性的聲音」",imgs:3,body:["Chester在2005年結識了Ryan Shuck，Chester當時寫下了《Let down》這首歌，Ryan聽了很喜歡，之後開始一起製作音樂，最終變成了後來的Dead by Sunrise。","DbS的曲風更加抒情流行，Chester在訪談說：「我想寫些流行一點的歌曲，我希望這個樂團聽起來跟Linkin Park不同，但Mike創造了我們(LP)最標誌性的聲音，所以他不在其中的話，自然就聽起來不同了。","」"]},
+{id:72,name:"副企劃：Dead by Sunrise 與 STP",arch:"B",sub:"",imgs:3,body:["Chester後來也參與了Bucket of Weenies跟Stone Temple Pilots跟Kings of Chaos的主唱工作，其中Bucket of Weenies跟Kings of Chaos皆是翻唱樂團。","原本Mike有點擔心Stone Temple Pilots的工作會影響Chester在LP的工作，但看到Chester那麼喜歡STP，最終他決定撥出時間讓Chester可以去進行STP的主唱工作。"]},
+{id:73,name:"腳踝受傷與One More Light爭議",arch:"D",sub:"連環低谷讓情況來到最低點",imgs:3,body:["在樂團第六張錄音室專輯《The Hunting Party》巡迴時期，Chester在登台前和大家一起打球時，意外摔斷了腳踝，之後他雖然還是堅持登台演出了完整25首歌曲，但醫生診斷他將暫時無法再進行任何演出，最終THP剩下的16場巡迴演出取消，Chester進入漫長的療養期，行動不便與無止盡的疼痛導致精神狀況明顯變差，他通常會用運動來轉移憂鬱的情緒，但由於腳傷導致完全做不到了。"]},
+{id:74,name:"腳踝受傷與One More Light爭議",arch:"B",sub:"",imgs:3,body:["樂團第七張錄音室專輯《One More Light》，其電子流行曲風引來各界大量對團員的質疑與攻擊，認為樂團出賣了靈魂，這令Chester感到極度憤怒，他在Twitter上花了很多時間抨擊那些批評的粉絲：「當你把它上升到人身攻擊、攻擊我們做人的品格時，老兄，閉上你的嘴。","這意味著我確實會對此產生情緒，而大多數時候我的感受就是『我真想殺了你』。","」","而在專輯正式發售的前一天，Chester的好友Chris Cornell也自縊身亡，連環低谷讓Chester的情況來到最低點…","…"]},
+{id:75,name:"Chester 離世",arch:"B",sub:"2017年7月20日，剛好是Chris Cornell的生日",imgs:3,body:["所有負面情緒排山倒海而來，不知道最終是什麼讓Chester決定放棄一切，但在2017年7月20日(剛好是Chris的生日)Chester也選擇了一樣的方式離開世界。","Chester離開後，樂團成員承受莫大的傷痛，所有活動停擺，據Mike所說，他當時完全聽不了樂團的歌，只要聽到就會崩潰的程度，甚至有了放棄音樂的想法。"]},
+{id:76,name:"Chester 離世",arch:"B",sub:"",imgs:3,body:["後來經過一陣子後，團員們又聚在一起，Dave提議他們應該辦個演唱會紀念Chester，紀念他們的朋友。","最終幾個月後，2017年10月27日，樂團邀請了其他與LP熟識的樂團朋友與音樂人們，一同舉辦了Chester的紀念致敬演唱會。"]},
+{id:77,name:"Rob Bourdon / 羅伯·巴登",arch:"A",sub:"1979年1月20日．前鼓手",imgs:5,body:["所有團員裡面最低調內斂的團員，話少但並不是無口，而是有種害羞大男孩的氣質(?)他是至今為止的團員裡最高的，在Colin加入之前是樂團裡年紀最小的。","他約從2012年開始奉行素食主義，雖然其他團員喜歡，但他討厭吃Nutella。"]},
+{id:78,name:"Rob Bourdon / 羅伯·巴登",arch:"B",sub:"",imgs:5,body:["團員們開玩笑玩鬧的時候也會一起跟上，其低調的性格使他在訪談與影片中鮮少登場，也不常提及個人的事情，因此即便閱覽無數資料跟訪談影片，但對Rob是怎麼樣的人依舊所知甚少，只能說是非常神秘的團員…","Rob的興趣包括彈鋼琴和衝浪(儘管他從未在樂團的錄音中彈過鋼琴)。","根據Mike在2018年最後一次提起Rob在做的事情，他說他離開了小鎮，開始了「純素淨化冥想之旅」","。"]},
+{id:79,name:"童年與 Relative Degree",arch:"D",sub:"樂團裡最早開始組樂團的團員",imgs:2,body:["Rob從8、9歲時就會跟哥哥一起用鼓錘跟著音樂打鼓，後來哥哥得到了一套鼓時，Rob則去學了鋼琴。","到了12歲時終於開始接受專業的鼓組課程並轉為全職鼓手，並且跟朋友一起組了樂隊演奏翻唱歌曲，是團員裡最早開始組樂團的團員。","高中時，他的父母讓他加入了學校的爵士樂隊，他也在其他樂團待過幾個月演出一場，但他不喜歡。","這時台下有兩位正在考慮組樂團的樂手看上他的表演邀請他去試鏡，雖然最終並沒有被選上，但Rob靠著這個人際關係認識了住在附近的Brad跟Mike。"]},
+{id:80,name:"童年與 Relative Degree",arch:"B",sub:"",imgs:2,body:["後來他們一起組了Relative Degree這個樂團，雖然Mike並沒有加入，但都會去看排練並在曲目中加入採樣。","樂團創作了12首歌曲，進行了長達1年的排練，最終1996年時終於得以在The Roxy劇院演出。","Brad說他高中時的目標就是作為一個音樂人在The Roxy為自己的朋友們演出，而這夢想終於實現後，Relative Degree的成員們開始失去專注力，最終樂團解散了。"]},
+{id:81,name:"黑暗時期與Chester的共鳴",arch:"D",sub:"曾迷失自我後重回正軌，成為Xero一員",imgs:4,body:["樂團解散後，Rob經歷了一段黑暗的時期，他沉迷毒品與酒精，與世隔絕，直到高中前夕生活才重回正軌重新開始打鼓。","而在那時，Rob接到了Mike的電話詢問他要不要聽聽他跟Brad還有Mark的創作，Rob聽了之後非常喜歡，便立刻參與其中，這組合叫Xero，後來Joe、Dave、Chester陸續加入，成為了後來的Linkin Park。","而Rob曾經的那段黑暗時期，令他跟Chester產生了共鳴。"]},
+{id:82,name:"黑暗時期與Chester的共鳴",arch:"B",sub:"",imgs:4,body:["根據Jeff Blue撰寫的Linkin Park成團傳記書，Chester最早剛加入樂團時，由於Chester有菸酒毒等不良習慣，而其他團員完全不接觸這些物質，這使他感到自己有種格格不入的違和感，儘管事實並非如此，但他還是一直覺得其他團員都不喜歡他。","但Rob的經驗讓他跟Chester產生了共鳴，使Chester向Rob傾訴心事，而Rob也一直在他身邊支持他，緩解他的焦慮感，幫助他逐漸融入樂團這個大家庭。"]},
+{id:83,name:"Rob 離隊",arch:"D",sub:"2022年主動表示想離開Linkin Park",imgs:2,body:["在Chester過世，2017年樂團宣布暫停活動之後，Rob基本上就完全淡出了公眾視野。","之後的幾年只有在採訪時露面過幾次，Rob也替Mike在Post Traumatic中的歌曲《Place To Start》錄製了打擊樂的部分。","最後一次參與樂團的公開活動是2020年的hybrid theory 20周年直播。"]},
+{id:84,name:"Rob 離隊",arch:"B",sub:"",imgs:2,body:["直到2022年，Rob都一直與樂團保持著聯繫，但在約2022年中後期時，Rob主動跟樂團表示他想離開Linkin Park，這也是為什麼Rob沒有參與Meteora 20周年紀念與Papercuts發行的原因。","Mike：「對我來說，站在朋友的角度，這令人感到難過，但同一時間，我也希望他去做任何能讓他快樂的事，大家也都真心祝福他一切都好。","我們永遠愛他，也永遠尊重我們一起建立的那些美好成就。","」","Rob離隊後，Mike找了Colin替補鼓手的位置。"]},
+{id:85,name:"Colin Brittain / 科林·布里坦",arch:"A",sub:"1986年12月29日．鼓手",imgs:3,body:["目前的所有團員裡最小的成員，大家的弟弟兼兒子(?)個性和善愛玩，聊起音樂時專業穩重。","喜歡在舞台上搬運樂團成員(?)。","樂團現在主要的飯撒擔當，繼Chester離開之後擔下了本團賣肉役的重要職位(?)因為都他負責在脫，演唱會上會脫，私下也常發一下露肌肉的照片。"]},
+{id:86,name:"Colin Brittain / 科林·布里坦",arch:"B",sub:"",imgs:3,body:["看到把衣服拉起來躺在賽車上的Colin，Dave說「我很高興不用由我來這麼做。","」","跟Dave是健身好夥伴，會一起在表演後泡冰池，但跟神色淡定的Dave相比，Colin好像不太能承受，一直很想逃出去。","跟Emily同為一起進入這個老樂團的弟弟妹妹，有一種不同於其他團員的親密感，他們曾兩人一起關小黑屋，密集學習樂團需要現場表演的所有樂曲。"]},
+{id:87,name:"粉絲互動與活動出席",arch:"B",sub:"官方活動遇到率Colin95%其他成員5%",imgs:3,body:["不同於前鼓手Rob的低調，Colin非常積極出席樂團的各種活動。","在樂團不再舉辦M&G的現在，Colin負責出席了目前樂團的絕大多數粉絲見面活動，他會隨機出現在快閃店，也會隨機在演唱會開始前來到趴竿區的欄杆邊跟粉絲們見面拍照聊天。","可以在官方活動隨機遇到其他成員的機率大概是Colin95%其他成員5%的程度。","現在樂團全體團員在網路上都逐漸轉純經營少交流的路線，Colin是唯一還有在Twitter上活躍的人，但後來不知名原因把帳號刪了，目前沒有任何復活的跡象。"]},
+{id:88,name:"音樂養成背景",arch:"D",sub:"透過重現《Faint》的取樣學習製作",imgs:2,body:["Colin的父親曾在鄉村樂團中演出，因此Colin從小就接觸音樂，童年幾乎被音樂包圍，很早便開始學習鼓、吉他和鋼琴。","後來Colin從15歲開始學習音樂製作，不過他的主要樂器始終是鼓，最初是透過嘗試重現其他歌曲中的取樣與聲音來學習製作，其中也包括Linkin Park的《Faint》。","高中畢業後，當他沒有在從事音樂工作時，他的樂團指導老師找不到人來負責教鼓，於是請Colin接手負責。"]},
+{id:89,name:"音樂養成背景",arch:"B",sub:"",imgs:2,body:["高中時Colin經常和朋友們一起玩音樂，五年後組成了樂團Oh No Fiasco，這個樂團成為Brittain發揮創意的出口：「我一直覺得，要組成一個在創作理念上相互契合的團體很困難，除非彼此之間不存在某種摩擦——而這個樂團確實是個例外。","我們每個人都會推動其他人，不斷突破自己的音樂舒適圈，而正因如此，我才能從許多不同的音樂類型中汲取影響。","」"]},
+{id:90,name:"製作人生涯",arch:"D",sub:"2017年為ONE OK ROCK、Papa Roach製作作品",imgs:4,body:["Colin真正開始獲得製作人署名是在2014年，搬到洛杉磯追求錄音室相關工作，並在流行搖滾樂團5 Seconds Of Summer的同名首張專輯中擔任額外製作人、工程師與混音師。","在接下來幾年裡持續累積製作人與詞曲作者的作品名單，參與了數十首單曲與專輯的製作。","2017年，他為ONE OK ROCK、Papa Roach和All Time Low製作了多張作品：「他們在我還什麼都不是的時候就給了我機會，單純只是因為他們相信我。"]},
+{id:91,name:"製作人生涯",arch:"B",sub:"",imgs:4,body:["我永遠都會感激那樣的信任，因為那建立了我的自信，讓我敢在製作音樂時冒更多險。","」","在COVID-19疫情期間，他的作品與製作人履歷開始大量增加。","2020年，他與音樂人Elisha Noll組成了American Teeth，兩人希望能夠創作一些在替其他音樂人工作時無法完全實現的音樂。"]},
+{id:92,name:"與Mike展開合作",arch:"D",sub:"「兩人在一起工作時很快就『合拍』了」",imgs:3,body:["到了2021年，Colin開始與Mike合作。","Mike表示，他和Colin幾乎從一開始就產生了很強的默契，當Linkin Park開始製作音樂時，邀請Colin過來一起工作的感覺非常自然。","Colin不只會演奏鼓，也會彈吉他、貝斯、鍵盤，同時還從事音樂製作與混音，Mike覺得自己和Colin看待音樂的方式很相似，因此兩人在一起工作時很快就「合拍」","了。","隨著Colin持續協助Mike創作，Mike與Colin之間的默契也逐漸感染了樂團的其他成員。"]},
+{id:93,name:"與Mike展開合作",arch:"B",sub:"",imgs:3,body:["而在Rob離隊，樂團需要一位新鼓手時，Mike詢問了Colin的意願：「嘿，兄弟，事實證明我們需要一個人來打鼓。","我知道那是你的主要樂器，你會想做這件事嗎？","我知道這意味著要暫時放下你的製作人事業。","」","同時這段對話發生在樂團了解到Brad不會參與現場演出，而又尚未找到Alex Feder作為現場代打吉他手之前。","Mike讓Colin自己選擇想成為現場吉他手還是現場鼓手，最終他成為了樂團的正式核心成員。","Mike形容他當時反應就像在糖果店裡因太多選擇而猶豫不決的小孩，Colin說：「我不敢相信你現在居然問我這個！","」"]},
+{id:94,name:"與Emily無試鏡加入",arch:"D",sub:"因為彼此合得來而選擇再次合作",imgs:3,body:["樂團當時並不想進行試鏡或選拔，而是希望和那些讓他們感到自在、彼此合得來的人一起工作。","由於之前已經和Emily以及Colin有過合作經驗，因此選擇再次與他們合作也很自然。","樂團成員也很重視Emily和Colin都屬於較年輕一代這一點，他們能夠提供不同的音樂觀點，同時也在自己的領域累積了相當豐富的經驗。","2024年，Colin補充說：「我從小就是五個孩子裡最大的…"]},
+{id:95,name:"與Emily無試鏡加入",arch:"B",sub:"",imgs:3,body:["但這些人真的讓我融入了這個團體裡，就像成為我的哥哥們一樣，尤其是在這麼競爭激烈的產業裡。","我和Em都已經在洛杉磯以及其他地方做這件事做了20年，所以這就像是一段職業生涯的延續…","除了和這些人一起做的事情之外，我們每個人也都花了很多時間經營自己的事業。","」","Colin曾在Twitter上特別提到Joe跟他總是形影不離：「不管我去到哪裡，Joe都會陪伴著我」","。"]},
+{id:96,name:"Emily Armstrong / 艾米莉·阿姆斯壯",arch:"A",sub:"1986年5月6日．主唱",imgs:6,body:["外表給人帥氣的大姊姊形象，但實際上更像個活潑開朗的妹妹只是長的很帥(??)在團裡跟大家的互動有種大家的妹妹或女兒的感覺，招牌動作是比中指，有事沒事都要比一下，帶動Mike也會跟他一起比，教壞人家(x","在台上喜歡隨著歌曲起舞，以及捉弄大家，Emily在台上的捉弄首選是Dave，時常跟Mike聯合包夾霸凌(?)Dave，Dave總是慈父笑容歡喜受(實際上是兩手花)(或是兩個爸爸陪女兒玩的概念)(x他們三個是最常在台上一起玩耍的組合。"]},
+{id:97,name:"舞台崗位挑戰戰績",arch:"B",sub:"代替團員演奏各種樂器崗位",imgs:5,body:["Emily還喜歡各種玩大家在台上的崗位，目前戰績：1.在Mike唱Heavy is the crown時唱了Rap的部分，後來Mike也嚐試在唱Rap的部分時小小的嘶吼了下但失敗了XDD。","2.在In the end時代替Joe按採樣器彈奏前奏的部分，這也變成了團員表演時的隨機挑戰項目，目前Mike跟Dave還有Emily都有參戰，Dave是彈得最好的(Emily跟Mike都高機率失敗)。"]},
+{id:98,name:"舞台崗位挑戰戰績",arch:"B",sub:"",imgs:5,body:["3.在Stained時代替Dave按開頭的採樣器彈奏。","4.在When they come for me時代替Colin打鼓。","5.Emily原本就有在Over each other跟Up from the bottom彈吉他所以好像也沒什麼好搶Alex的工作了(?)"]},
+{id:99,name:"粉絲互動與社群風格",arch:"B",sub:"清空IG貼文但暗藏粉絲梗",imgs:4,body:["調皮的Emily很大程度促成了樂團在舞台上更自由歡快的台風，充滿了小家庭般的溫馨感。","作為同性戀女神(?)Emily經常從粉絲那收到應援胸罩，他本人也很喜歡。","經常把Points of Authority這首歌的歌詞唱錯，所以唱這首的時候有機會看到平常總在台上跑來跑去的Emily站定點一直偷看提詞機很有趣…","自從加入LP後就清空了IG貼文，也鮮少發文，估計是為了儘量避免不必要的衝突(樂團回歸後他幾乎負責吸收了所有的不滿砲火)。","但他卻又知道一些網路上的當紅迷因還有一些粉絲間的梗⋯估計是有辦個小號偷窺大家了⋯⋯"]},
+{id:100,name:"音樂啟蒙與 Dead Sara",arch:"D",sub:"12歲收到第一把吉他，發現自己有嘶吼的能力",imgs:2,body:["Emily在12歲的生日時收到了自己人生中的第一把吉他，在這之後就決定這輩子只想在搖滾樂團裡表演。","而在學期間，他在對自己老師感到極端憤怒時偶然地發現了自己有嘶吼的能力，他完全沒有聽過自己有這樣的聲音，後來他立刻跑到練習室裡試圖重現那樣的聲音，自他發現之後他就開始不斷的磨練這樣的聲音。"]},
+{id:101,name:"音樂啟蒙與 Dead Sara",arch:"B",sub:"",imgs:2,body:["在校期間，Emily也曾與多個民謠樂團合作演出並精進實力，最終為了追求自己的音樂事業選擇高中輟學。","Emily在高中的時候認識了Siouxsie Medley，他們兩人從2003年開始一起創作音樂，曾以Epiphany作為團名演出，當時的Emily彈貝斯，後來將樂團名改為了Dead Sara。"]},
+{id:102,name:"音樂啟蒙與 Dead Sara",arch:"B",sub:"",imgs:2,body:["Dead Sara從2007年首次展開巡演，期間換過好幾位鼓手跟貝斯手，2010年創立了自己的唱片公司Pocket Kid Records，Emily很快在業界以主唱身分打響了名號，而《Weatherman》這首單曲也讓樂團一炮而紅、獲獎無數，2012年推出同名錄音室專輯後，在2014年跟2020年各推出了《Pleasure to Meet You》、《Ain't It Tragic》兩張錄音室專輯。"]},
+{id:103,name:"與Mike首次接觸(2019)",arch:"D",sub:"創作動力斷斷續續的初期階段",imgs:2,body:["據Mike所說，包含Rob Bourdon在內的許多人都曾經建議他應該見見Emily並合作，相信他們會處得很好。","在2017年Chester過世時，Emily曾主動聯絡樂團，表示希望參加致敬演唱會的演出，但當時演出籌備已經一段時間了，無法臨時再增加來賓。","而到了2019年，Emily才終於跟Mike開始有了第一次的合作，他也在那時認識了Dave跟Joe，但當時的製作進度斷斷續續，在音樂上仍然還沒有太多的動力。","2019-2021年期間樂團都有持續嘗試創作但就是缺乏創作動力。"]},
+{id:104,name:"《Unshatter》Demo 誕生",arch:"D",sub:"Joe提議讓Emily的聲音擔任整首歌主唱",imgs:2,body:["直到某天，他們已經寫了十幾首自己喜歡的歌，其中有一兩首Emily在其中唱了部分段落或副歌，也在幾首裡唱了背景合聲。","Mike跟Dave、Joe在討論這些新歌時，Joe突然說「你覺得我們可以錄個Demo，讓她的聲音擔任主唱，整首歌都由她來唱，看看聽起來如何嗎？","」"]},
+{id:105,name:"《Unshatter》Demo 誕生",arch:"B",sub:"",imgs:2,body:["Mike心想「我知道Emily會願意，我也知道Joe聽了會喜歡，非常確定，這是一件大事。","」","而《Unshatter》是他們跟Emily合作的第一首歌曲，也是這次電影的標題。","Mike表示，這段時期的Demo也許在最終成果上無足輕重，但對於他們跨出全新的第一步來說是不可或缺的。"]},
+{id:106,name:"正式邀請加入(2023)",arch:"D",sub:"「開車回家的路上整整飄了三天」",imgs:4,body:["之後樂團自然地進入了開始積極創作的階段，一開始只有Mike、Dave、Joe，Brad比較晚才開始加入創作。","樂團非常有意識地不去馬上將其稱為「Linkin Park的音樂」","，只是單純享受跟Emily還有Colin一起寫歌的樂趣。","Mike形容Emily加入之前的過程：「假如這是一幅畫，那它一開始就是一個空白畫布，然後我們畫了點東西，再把它擦掉，接著又畫了點東西，又擦掉它，然後慢慢地開始變成『也許這部分不錯』直到我們開始覺得『就是這個了』，而那就是Emily出現的時候。"]},
+{id:107,name:"正式邀請加入(2023)",arch:"B",sub:"",imgs:4,body:["」","Mike也提到，當他考慮是否邀請一個人進入團體時，除了才華之外，最重要的其實是——我們大家是否真的相處得很好？","我們是否想待在一起？","直到2023年9月，Mike第一次詢問了Emily對於Linkin Park相關事宜的想法：「嘿，我們接下來有一些演出，還有一些大型音樂節活動，大概是一年後，我們覺得你非常棒，我們認為你可以唱所有的老歌，我們很喜歡你的表現，也喜歡這整個過程中所發生的一切…"]},
+{id:108,name:"正式邀請加入(2023)",arch:"B",sub:"",imgs:4,body:["…","」","在這個時間點，Mike甚至還沒有聽過Emily唱過任何LP舊歌，這令Emily很訝異。","而Emily表現得很平淡冷靜地說「好啊，如果你們想要我加入的話。","」","但其實他根本嚇瘋了，開車回家的路上表示自己就像去迪士尼樂園一樣，甚至不記得自己是怎麼回家的，整整飄了三天。","Emily為了隱瞞加入LP這件事，甚至不敢跟朋友們見面，異樣甚至讓朋友們誤會他又交了新的女朋友。"]},
+{id:109,name:"與Colin一起準備回歸演唱會",arch:"B",sub:"「在這件事上我們擁有彼此」",imgs:4,body:["接著Emily跟Colin開始為了樂團回歸演唱會做準備，Mike表示看到Colin跟Emily作為兩個新人一起扶持，他們擁有彼此這件事非常令人欣慰，就像是「我們是新人！","我們多排練一點，把每件事都做好！","」","Emily也證實了這一點：「如果只有我自己一個人，我是做不到的。","在整個過程中能有他陪著我真是一種祝福，在這件事上我們擁有彼此…","如果沒有他，我不認為自己能表現得如此自在。","」","Emily在一些歌曲接近結束時也會踏上Colin的鼓，配合最後的鼓聲一躍而下，Emily在Dead Sara時有跳水進鼓組裡的習慣但在LP還尚未展現(?)"]},
+{id:110,name:"舊歌重新排練的挑戰",arch:"B",sub:"《Numb》《In The End》《Crawling》最具挑戰性",imgs:3,body:["Colin跟Emily比其他團員們提早幾個月就開始在Colin的工作室練習表演老歌，他認為唱老歌比新歌曲更加困難，因為即便他知道這些歌怎麼唱，但它有歲月的沉澱，有太多值得挖掘的東西，它已經在宇宙中凝固成形，為了讓它變成能讓自己跟聽眾都能產生共鳴的東西，必須想辦法打破它。","《Numb》、《In The End》和《Crawling》都是他覺得特別有挑戰性的歌曲。"]},
+{id:111,name:"舊歌重新排練的挑戰",arch:"B",sub:"",imgs:3,body:["Mike理解有些歌迷可能不會喜歡，因為他們「暫時」","還不習慣，但他相信隨著更多人看到她演唱這些歌曲，大家會漸漸接受的。","Mike也說他最初與Emily第一次合作演出時感覺非常奇怪，但他知道這只是因為感覺不同，隨著時間推移就會慢慢合理化。","Colin在現場演出中擔任了音樂總監的角色，與技術人員和樂團成員一起協調曲目安排與演出時刻，Mike表示這有助於營造出大家依然可以彼此倚靠的感覺。"]},
+{id:112,name:"From Zero／Unshatter：專輯名稱含義",arch:"D",sub:"「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣」",imgs:2,body:["Mike談到再次現場表演舊歌：「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣。","每個人都有一個核心身份，那些成就了『你』的事物，就在最核心的位置，對我來說那就是Linkin Park。","之前的狀態就像『喔，你不能再以Linkin Park的名義演出了』，即使Linkin Park已經是我DNA的一部分。","雖然你還仍然擁有其他事物，但失去那個核心是令人痛苦的。","所以能把它找回來…","真的無與倫比，再也不會有任何事情能與之媲美了。","」"]},
+{id:113,name:"From Zero／Unshatter：專輯名稱含義",arch:"B",sub:"",imgs:2,body:["新專輯名稱《From Zero》，Zero這詞是樂團的原點Xero，預告樂團回歸的倒數直播標題使用了ø這個符號，亦是Zero的意思，各方面都是樂團的「從零開始」","。","「Shatter」","指的是玻璃或物件破裂成無數碎片，而將其轉為「Unshatter」","，字面意思是「讓碎片回歸原狀」","，然而破碎過的東西無法恢復到完美無缺，這個詞象徵的不是「時光倒流、抹去創傷」","，而是將所有碎裂的記憶、悲傷與遺憾重新整合。","樂團如何從零開始？","如何從破碎再次重新修復？","將由Joe導演，紀錄並呈現在《Unshatter》裡面。"]}
+];
+
+/* 每張卡片的短標籤（用於分頁主題標籤列） */
+var tagMap={
+  1:"基本資料",2:"造型與嗜好①",3:"造型與嗜好②",4:"歌聲信心",5:"音樂啟蒙①",6:"音樂啟蒙②",7:"美術才華",8:"組團淵源①",9:"組團淵源②",10:"Fort Minor",11:"創作理念①",12:"創作理念②",13:"痛失夥伴①",14:"痛失夥伴②",15:"致敬演唱會",16:"療傷專輯①",17:"療傷專輯②",18:"個人專輯①",19:"個人專輯②",20:"Twitch直播①",21:"Twitch直播②",22:"回歸單曲",23:"找回自信①",24:"找回自信②",25:"倒數直播",26:"回歸預告",27:"基本資料",28:"搞笑擔當",29:"刺青胎記",30:"高爾夫健身",31:"音樂養成①",32:"音樂養成②",33:"缺席趣事",34:"樂團調和者",35:"情感支柱①",36:"情感支柱②",37:"基本資料",38:"電波個性",39:"體態變化",40:"藝術背景",41:"加入樂團",42:"MV導演",43:"促成回歸①",44:"促成回歸②",45:"基本資料",46:"毒舌日常",47:"組團經歷①",48:"組團經歷②",49:"促成簽約",50:"三年碰壁",51:"回歸參與度①",52:"回歸參與度②",53:"基本資料①",54:"基本資料②",55:"面對酸民",56:"溫柔一面①",57:"溫柔一面②",58:"歌唱啟蒙①",59:"歌唱啟蒙②",60:"歌唱啟蒙③",61:"早期樂團①",62:"早期樂團②",63:"團名由來①",64:"團名由來②",65:"公司施壓",66:"成癮背景①",67:"成癮背景②",68:"戒酒諮商①",69:"戒酒諮商②",70:"與Mike默契",71:"副企劃①",72:"副企劃②",73:"受傷與爭議①",74:"受傷與爭議②",75:"永遠懷念①",76:"永遠懷念②",77:"基本資料①",78:"基本資料②",79:"組團經歷①",80:"組團經歷②",81:"黑暗時期①",82:"黑暗時期②",83:"淡出樂團①",84:"淡出樂團②",85:"基本資料①",86:"基本資料②",87:"粉絲互動",88:"音樂養成①",89:"音樂養成②",90:"製作人生涯①",91:"製作人生涯②",92:"與Mike合作①",93:"與Mike合作②",94:"無試鏡加入①",95:"無試鏡加入②",96:"基本資料",97:"崗位挑戰①",98:"崗位挑戰②",99:"社群風格",100:"音樂啟蒙①",101:"音樂啟蒙②",102:"音樂啟蒙③",103:"初次接觸",104:"Demo誕生①",105:"Demo誕生②",106:"正式加入①",107:"正式加入②",108:"正式加入③",109:"回歸籌備",110:"老歌挑戰①",111:"老歌挑戰②",112:"專輯命名①",113:"專輯命名②"
+};
+
+/* 每張卡片挑選的最佳畫質配圖（來源：linkin park.pptx） */
+var pageImageMap={
+  1:"image20.jpg",2:"image13.jpg",3:"image3.jpg",4:"image9.jpg",5:"image28.jpg",6:"image17.jpg",7:"image16.jpg",8:"image43.jpg",9:"image27.jpg",10:"image30.jpg",11:"image24.jpg",12:"image49.jpg",13:"image35.jpg",14:"image38.jpg",15:"image33.jpg",16:"image36.jpg",17:"image34.jpg",18:"image40.jpg",19:"image40.jpg",20:"image45.jpg",21:"image44.jpg",22:"image51.jpg",23:"image55.jpg",24:"image37.jpg",25:"image47.jpg",26:"image52.jpg",27:"image66.jpg",28:"image56.jpg",29:"image69.jpg",30:"image61.jpg",31:"image71.jpg",32:"image79.jpg",33:"image87.jpg",34:"image76.jpg",35:"image74.jpg",36:"image88.jpg",37:"image96.jpg",38:"image100.jpg",39:"image91.jpg",40:"image93.jpg",41:"image92.jpg",42:"image108.jpg",43:"image111.jpg",44:"image101.jpg",45:"image127.jpg",46:"image128.jpg",47:"image118.jpg",48:"image120.jpg",49:"image134.jpg",50:"image117.jpg",51:"image143.jpg",52:"image129.jpg",53:"image130.jpg",54:"image140.jpg",55:"image139.jpg",56:"image137.jpg",57:"image133.jpg",58:"image146.jpg",59:"image144.jpg",60:"image141.jpg",61:"image145.jpg",62:"image142.jpg",63:"image150.jpg",64:"image149.jpg",65:"image154.jpg",66:"image165.jpg",67:"image160.jpg",68:"image166.jpg",69:"image152.jpg",70:"image158.jpg",71:"image164.jpg",72:"image155.jpg",73:"image178.jpg",74:"image162.jpg",75:"image194.jpg",76:"image31.jpg",77:"image177.jpg",78:"image174.jpg",79:"image185.jpg",80:"image172.jpg",81:"image176.jpg",82:"image173.jpg",83:"image180.jpg",84:"image175.jpg",85:"image190.jpg",86:"image186.jpg",87:"image182.jpg",88:"image179.jpg",89:"image181.jpg",90:"image191.jpg",91:"image188.jpg",92:"image189.jpg",93:"image196.jpg",94:"image202.jpg",95:"image195.jpg",96:"image200.jpg",97:"image203.jpg",98:"image201.jpg",99:"image209.jpg",100:"image208.jpg",101:"image223.jpg",102:"image208.jpg",103:"image211.jpg",104:"image217.jpg",105:"image211.jpg",106:"image214.jpg",107:"image213.jpg",108:"image214.jpg",109:"image219.jpg",110:"image226.jpg",111:"image224.jpg",112:"image227.jpg",113:"image228.jpg"
+};
+function imgSrc(p){ return 'images/'+pageImageMap[p.id]; }
+function attr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+/* 依照 arch==='A' 的頁面把 pages 拆成各團員分組 */
+var members=[];
+pages.forEach(function(p){
+  if(p.arch==='A'){
+    var parts=p.name.split('/');
+    var en=parts[0].trim();
+    var zh=parts.length>1?parts[1].trim():p.name;
+    members.push({en:en,zh:zh,sub:p.sub,pages:[]});
+  }
+  members[members.length-1].pages.push(p);
+});
+
+var state={view:'home',memberIdx:0,cardIdx:0,dragX:0,dragging:false,lightbox:false,pendingNav:null};
+
+function currentMember(){ return members[state.memberIdx]; }
+function currentCard(){ return currentMember().pages[state.cardIdx]; }
+
+function openMember(i){ state.memberIdx=i; state.cardIdx=0; state.view='deck'; renderApp(); }
+function goHome(){ state.view='home'; renderApp(); }
+
+function jumpToIndex(i){ state.cardIdx=i; renderApp(); }
+
+function prevCard(){
+  if(state.cardIdx>0){ state.cardIdx--; renderApp(); }
+  else if(state.memberIdx>0){ state.pendingNav=-1; renderApp(); }
+}
+function nextCard(){
+  var m=currentMember();
+  if(state.cardIdx<m.pages.length-1){ state.cardIdx++; renderApp(); }
+  else if(state.memberIdx<members.length-1){ state.pendingNav=1; renderApp(); }
+}
+function confirmNav(){
+  var d=state.pendingNav; state.pendingNav=null;
+  if(d===1){ state.memberIdx++; state.cardIdx=0; }
+  else { state.memberIdx--; state.cardIdx=members[state.memberIdx].pages.length-1; }
+  renderApp();
+}
+function cancelNav(){ state.pendingNav=null; renderApp(); }
+
+function openLightbox(){ state.lightbox=true; renderApp(); }
+function closeLightbox(){ state.lightbox=false; renderApp(); }
+
+var touchStartX=0, touching=false;
+function cardTouchStart(e){ if(state.pendingNav!==null) return; touching=true; touchStartX=e.touches[0].clientX; state.dragX=0; }
+function cardTouchMove(e){
+  if(!touching) return;
+  state.dragX=e.touches[0].clientX-touchStartX;
+  var el=document.querySelector('.deck-card');
+  if(el) el.style.transform='translateX('+state.dragX+'px)';
+}
+function cardTouchEnd(){
+  if(!touching) return;
+  touching=false;
+  var dx=state.dragX; state.dragX=0;
+  if(dx<-60) nextCard();
+  else if(dx>60) prevCard();
+  else { var el=document.querySelector('.deck-card'); if(el) el.style.transform='translateX(0)'; }
+}
+document.addEventListener('keydown',function(e){
+  if(state.view!=='deck') return;
+  if(state.pendingNav!==null){ if(e.key==='Enter') confirmNav(); else if(e.key==='Escape') cancelNav(); return; }
+  if(state.lightbox){ if(e.key==='Escape') closeLightbox(); return; }
+  if(e.key==='ArrowRight') nextCard();
+  else if(e.key==='ArrowLeft') prevCard();
+  else if(e.key==='Escape') goHome();
+});
+
+function renderHome(){
+  var html='<div class="home"><div class="home-hero">'+
+    '<h1 class="home-hero-title">LINKIN PARK</h1>'+
+    '<p class="home-hero-sub">團員小百科．樂團故事卡片</p>'+
+    '</div><div class="home-grid">';
+  members.forEach(function(m,i){
+    var cover=imgSrc(m.pages[0]);
+    html+='<button class="home-card" onclick="openMember('+i+')">'+
+      '<img src="'+cover+'" alt="'+attr(m.zh)+'" loading="lazy">'+
+      '<div class="home-card-scrim"></div>'+
+      '<div class="home-card-count">'+m.pages.length+'</div>'+
+      '<div class="home-card-label"><span class="home-card-name">'+m.zh+'</span><span class="home-card-sub">'+m.en+'</span></div>'+
+    '</button>';
+  });
+  html+='</div><div class="home-footer">內容整理自團員訪談與樂團故事整理　．　點卡片進入閱讀</div></div>';
+  return html;
+}
+
+function renderProgress(){
+  var m=currentMember(), idx=state.cardIdx;
+  var segs=m.pages.map(function(p,i){
+    var cls='seg'+(i===idx?' active':(i<idx?' done':''));
+    return '<div class="'+cls+'"></div>';
+  }).join('');
+  return '<div class="deck-progress">'+segs+'</div>';
+}
+
+function renderTags(){
+  var m=currentMember();
+  return '<div class="tagrow-nav" id="tagrowNav">'+m.pages.map(function(p,i){
+    return '<button class="tagbtn'+(i===state.cardIdx?' active':'')+'" onclick="jumpToIndex('+i+')">'+attr(tagMap[p.id])+'</button>';
+  }).join('')+'</div>';
+}
+
+function renderHeader(){
+  var m=currentMember();
+  return '<div class="deck-header">'+
+    '<button class="icon-btn" onclick="goHome()">‹</button>'+
+    '<div class="deck-header-title"><span class="deck-header-name">'+m.zh+'</span>'+
+    '<span class="deck-header-count">'+(state.cardIdx+1)+' / '+m.pages.length+'</span></div>'+
+    '<div style="width:36px"></div>'+
+  '</div>'+renderProgress()+renderTags();
+}
+
+function renderCard(p){
+  var paras=p.body.map(function(t){ return '<p>'+t+'</p>'; }).join('');
+  return '<div class="deck-card-wrap" ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd()">'+
+    '<div class="deck-card">'+
+      '<div class="page-card">'+
+        '<img class="page-card-img" src="'+imgSrc(p)+'" alt="'+attr(p.name)+'" onclick="openLightbox()">'+
+        '<div class="page-card-scrim"></div>'+
+        '<div class="page-card-caption"><h3>'+p.name+'</h3><p class="csub">'+p.sub+'</p>'+paras+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderFooter(){
+  var m=currentMember();
+  var atStart=state.memberIdx===0&&state.cardIdx===0;
+  var atEnd=state.memberIdx===members.length-1&&state.cardIdx===m.pages.length-1;
+  return '<div class="deck-nav">'+
+    '<button class="nav-btn" '+(atStart?'disabled':'')+' onclick="prevCard()">‹ 上一頁</button>'+
+    '<button class="nav-btn primary" '+(atEnd?'disabled':'')+' onclick="nextCard()">下一頁 ›</button>'+
+  '</div>';
+}
+
+function renderLightbox(){
+  if(!state.lightbox) return '';
+  var p=currentCard();
+  return '<div class="lightbox" onclick="closeLightbox()"><img src="'+imgSrc(p)+'" alt="'+attr(p.name)+'"></div>';
+}
+
+function renderConfirm(){
+  if(state.pendingNav===null) return '';
+  var target=members[state.memberIdx+state.pendingNav];
+  var dirLabel=state.pendingNav===1?'下一位':'上一位';
+  return '<div class="confirm-overlay"><div class="confirm-box">'+
+    '<div class="confirm-eyebrow">即將前往'+dirLabel+'團員</div>'+
+    '<div class="confirm-name">'+attr(target.zh)+'</div>'+
+    '<div class="confirm-actions">'+
+      '<button class="nav-btn" onclick="cancelNav()">留在原頁</button>'+
+      '<button class="nav-btn primary" onclick="confirmNav()">繼續</button>'+
+    '</div></div></div>';
+}
+
+function renderApp(){
+  var app=document.getElementById('app');
+  if(state.view==='home'){
+    app.innerHTML=renderHome();
+  } else {
+    app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm();
+    var active=app.querySelector('.tagbtn.active');
+    if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
+  }
+}
+renderApp();
+</script>
+</body>
+</html>
