@@ -204,9 +204,6 @@
   padding:10px 22px; border-radius:9999px; border:none; background:var(--accent);
   color:var(--bg); font-weight:800; cursor:pointer;
 }
-.secret-box .secret-secondary{
-  background:transparent; border:1px solid var(--border-interactive); color:var(--text); box-shadow:none;
-}
 </style>
 </head>
 <body>
@@ -215,7 +212,7 @@
 
 <script>
 var pages=[
-{id:1,name:"Mike Shinoda / 麥克篠田",arch:"A",sub:"1977年2月11日．團長、主唱(饒舌/唱歌/和聲)、鍵盤手、節奏吉他手、詞曲作者、音樂製作人",imgs:6,body:["日本名字是篠田賢治。","個性親切隨和風趣，還是天生的表情包表情超豐富。","小時候有嚴重的氣喘及貓過敏，隨著年齡增長後情況好轉但貓還是不太行的樣子。","可是他很喜歡貓，是 Hello Kitty 粉絲！","不菸不酒不毒不刺青，因為他覺得刺上去的圖案可能一個禮拜他就會膩了。","有點介意自己的頭看起來很大。"]},
+{id:1,name:"Mike Shinoda / 麥克篠田",arch:"A",sub:"1977年2月11日．團長、主唱(饒舌/唱歌/和聲)、鍵盤手、節奏吉他手、詞曲作者、音樂製作人",imgs:6,body:["日本名字是篠田賢治。","個性親切隨和風趣，還是天生的表情包，表情超豐富。","小時候有嚴重的氣喘及貓過敏，隨著年齡增長後情況好轉但貓還是不太行的樣子。","可是他很喜歡貓，是 Hello Kitty 粉絲！","不菸不酒不毒不刺青，因為他覺得刺上去的圖案可能一個禮拜他就會膩了。","有點介意自己的頭看起來很大。"]},
 {id:2,name:"造型變化與日本文化興趣",arch:"C",sub:"綽號「膠水」／Spike Minoda．染髮史．Halo與任天堂",imgs:5,body:["因為Mike負責統籌整合所有的事情，團員們過去戲稱他為「膠水」","因為年輕時的刺刺頭造型，也有 Spike Minoda 的綽號。","還染過五顏六色的頭髮，但第二張專輯後就不再用刺刺頭，也不染髮戴耳環了，說是想給自己小孩當榜樣。","喜愛各種日本文化，甚至有買 VOCALOID 來做歌過。","超喜歡任天堂，雖然有日本血統但完全不會日文。"]},
 {id:3,name:"造型變化與日本文化興趣",arch:"B",sub:"",imgs:5,body:["在巡迴巴士上會拉著團員一起打電動，非常喜歡 Halo，甚至拉贊助在自己的演唱會設 Halo 遊玩攤位跟粉絲同樂。","跟 Dave 玩 Halo 有絕佳的默契因此自稱他們是「夢幻隊伍」。","從來不露出太多肌膚範圍，甚至常在演唱會的衣服裡穿內搭紮進褲子裡防肚子走光，出道20幾年了連鎖骨長什麼樣子都沒有看過⋯結果唯一的狗仔偷拍照是泳裝照(這是真的)。"]},
 {id:4,name:"歌聲自信心",arch:"B",sub:"從功能性唱腔到被Chester鼓勵",imgs:3,body:["其實對自己的歌聲非常沒有自信，說他是自己歌聲的最大批判者，長年只負責歌曲的饒舌部分與合聲，甚至認為自己的歌聲只是「功能性」，不把自己歸類在歌手。","後來被前一任主唱 Chester 大力鼓勵下，才逐漸開始在樂團的部分歌曲裡擔任主要歌唱部分。","與饒舌時的霸氣強悍風格不同，唱歌時的歌聲是溫柔甜美系的⋯無法唱嘶吼腔（其實他不是沒有嘗試過但似乎很抗拒）。"]},
@@ -325,8 +322,8 @@ var pages=[
 {id:108,name:"與Colin一起準備回歸演唱會",arch:"B",sub:"「在這件事上我們擁有彼此」",imgs:4,body:["接著Emily跟Colin開始為了樂團回歸演唱會做準備，Mike表示看到Colin跟Emily作為兩個新人一起扶持，他們擁有彼此這件事非常令人欣慰，就像是「我們是新人！","我們多排練一點，把每件事都做好！","」","Emily也證實了這一點：「如果只有我自己一個人，我是做不到的。","在整個過程中能有他陪著我真是一種祝福，在這件事上我們擁有彼此…","如果沒有他，我不認為自己能表現得如此自在。","」","Emily在一些歌曲接近結束時也會踏上Colin的鼓，配合最後的鼓聲一躍而下，Emily在Dead Sara時有跳水進鼓組裡的習慣但在LP還尚未展現(?)"]},
 {id:109,name:"舊歌重新排練的挑戰",arch:"B",sub:"《Numb》《In The End》《Crawling》最具挑戰性",imgs:3,body:["Colin跟Emily比其他團員們提早幾個月就開始在Colin的工作室練習表演老歌，他認為唱老歌比新歌曲更加困難，因為即便他知道這些歌怎麼唱，但它有歲月的沉澱，有太多值得挖掘的東西，它已經在宇宙中凝固成形，為了讓它變成能讓自己跟聽眾都能產生共鳴的東西，必須想辦法打破它。","《Numb》、《In The End》和《Crawling》都是他覺得特別有挑戰性的歌曲。"]},
 {id:110,name:"舊歌重新排練的挑戰",arch:"B",sub:"",imgs:3,body:["Mike理解有些歌迷可能不會喜歡，因為他們「暫時」","還不習慣，但他相信隨著更多人看到她演唱這些歌曲，大家會漸漸接受的。","Mike也說他最初與Emily第一次合作演出時感覺非常奇怪，但他知道這只是因為感覺不同，隨著時間推移就會慢慢合理化。","Colin在現場演出中擔任了音樂總監的角色，與技術人員和樂團成員一起協調曲目安排與演出時刻，Mike表示這有助於營造出大家依然可以彼此倚靠的感覺。"]},
-{id:111,name:"From Zero／Unshatter：專輯名稱含義",arch:"D",sub:"「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣」",imgs:2,body:["Mike談到再次現場表演舊歌：「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣。","每個人都有一個核心身份，那些成就了『你』的事物，就在最核心的位置，對我來說那就是Linkin Park。","之前的狀態就像『喔，你不能再以Linkin Park的名義演出了』，即使Linkin Park已經是我DNA的一部分。","雖然你還仍然擁有其他事物，但失去那個核心是令人痛苦的。","所以能把它找回來…","真的無與倫比，再也不會有任何事情能與之媲美了。","」"]},
-{id:112,name:"From Zero／Unshatter：專輯名稱含義",arch:"B",sub:"",imgs:2,body:["新專輯名稱《From Zero》，Zero這詞是樂團的原點Xero，預告樂團回歸的倒數直播標題使用了ø這個符號，亦是Zero的意思，各方面都是樂團的「從零開始」","。","「Shatter」","指的是玻璃或物件破裂成無數碎片，而將其轉為「Unshatter」","，字面意思是「讓碎片回歸原狀」","，然而破碎過的東西無法恢復到完美無缺，這個詞象徵的不是「時光倒流、抹去創傷」","，而是將所有碎裂的記憶、悲傷與遺憾重新整合。","樂團如何從零開始？","如何從破碎再次重新修復？","將由Joe導演，紀錄並呈現在《Unshatter》裡面。"]}
+{id:111,name:"From Zero／Unshatter：名稱含義",arch:"D",sub:"「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣」",imgs:2,body:["Mike談到再次現場表演舊歌：「這就像一件你覺得被剝奪了的事情，但現在能夠重新找回來一樣。","每個人都有一個核心身份，那些成就了『你』的事物，就在最核心的位置，對我來說那就是Linkin Park。","之前的狀態就像『喔，你不能再以Linkin Park的名義演出了』，即使Linkin Park已經是我DNA的一部分。","雖然你還仍然擁有其他事物，但失去那個核心是令人痛苦的。","所以能把它找回來…","真的無與倫比，再也不會有任何事情能與之媲美了。","」"]},
+{id:112,name:"From Zero／Unshatter：名稱含義",arch:"B",sub:"",imgs:2,body:["新專輯名稱《From Zero》，Zero這詞是樂團的原點Xero，預告樂團回歸的倒數直播標題使用了ø這個符號，亦是Zero的意思，各方面都是樂團的「從零開始」。","「Shatter」指的是玻璃或物件破裂成無數碎片，而將其轉為「Unshatter」，字面意思是「讓碎片回歸原狀」，然而破碎過的東西無法恢復到完美無缺，這個詞象徵的不是「時光倒流、抹去創傷」，而是將所有碎裂的記憶、悲傷與遺憾重新整合。","樂團如何從零開始？","如何從破碎再次重新修復？","將由Joe導演，紀錄並呈現在《Unshatter》裡面。"]}
 ];
 
 /* 每張卡片挑選的最佳畫質配圖（來源：linkin park.pptx） */
@@ -488,14 +485,14 @@ function showLockedHint(){
   setTimeout(function(){ el.remove(); }, 2200);
 }
 function dismissUnlock(){ state.justUnlocked=false; renderApp(); }
-function goHomeFromUnlock(){ state.justUnlocked=false; state.view='home'; renderApp(); }
 function activateUnshatterAndClose(){
+  state.justUnlocked=false;
+  state.view='home';
   document.documentElement.classList.remove('theme-flashing');
   void document.documentElement.offsetWidth;
   document.documentElement.classList.add('theme-flashing');
   document.documentElement.setAttribute('data-theme','unshatter');
   try{ localStorage.setItem('lp-theme','unshatter'); }catch(e){}
-  state.justUnlocked=false;
   setTimeout(function(){
     document.documentElement.classList.remove('theme-flashing');
   }, 900);
@@ -590,7 +587,7 @@ function renderHome(){
     '<h1 class="home-hero-title">LINKIN PARK</h1>'+
     '<p class="home-hero-sub">團員小百科．樂團故事卡片</p>'+
     '<div class="progress-badge">已閱覽 <span class="fill">'+getViewed().length+'</span> / '+TOTAL_PAGES+'</div>'+
-    '<div class="home-footer">內容整理自團員訪談與樂團故事整理　．　點卡片進入閱讀</div>'+
+    '<div class="home-footer">內容整理自團員訪談與樂團故事　．　點擊卡片開始閱讀</div>'+
     '</div><div class="home-grid">';
   members.forEach(function(m,i){
     var cover=memberCoverSrc(m);
@@ -695,8 +692,7 @@ function renderUnlockCelebration(){
     '<h2>Unshatter Mode 已解鎖</h2>'+
     '<p>你已經讀完了關於這支樂團的每一段故事——\n從 Mike 的童年鋼琴課，到 Chester 最後的那個夜晚，\n再到 Emily 與 Colin 加入後的重新開始。\n\n「Unshatter」不是抹去傷痕，\n而是把所有碎片重新拼回一起。\n\n現在，你可以切換到 Unshatter Mode 了。</p>'+
     '<div class="secret-actions">'+
-      '<button class="secret-secondary" onclick="goHomeFromUnlock()">返回首頁</button>'+
-      '<button onclick="activateUnshatterAndClose()">立即切換</button>'+
+      '<button onclick="activateUnshatterAndClose()">返回首頁．立即切換</button>'+
     '</div>'+
   '</div></div>';
 }
