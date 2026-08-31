@@ -58,9 +58,10 @@
     background:var(--bg-elevated); color:var(--text); font-size:18px; line-height:1; cursor:pointer;
   }
   .icon-btn:active{opacity:.8}
-  .deck-progress{flex-shrink:0; display:flex; gap:4px; padding:0 12px 10px}
-  .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04)}
-  .seg.active,.seg.done{background:var(--accent)}
+  .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:4px; padding:0 12px 10px}
+  .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04); cursor:pointer; transition:height .15s,background .15s}
+  .seg.active{background:var(--accent)}
+  .seg.current{height:6px}
 
   .tagrow-nav{flex-shrink:0; display:flex; gap:8px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
   .tagrow-nav::-webkit-scrollbar{display:none}
@@ -71,18 +72,17 @@
   }
   .tagbtn.active{background:var(--accent); border-color:var(--accent); color:#fff}
 
-  .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y}
+  .deck-card-wrap{flex:1; padding:4px 14px 14px; overflow:hidden; touch-action:pan-y; min-height:0}
   .deck-card{height:100%; transition:transform .15s ease-out}
   .page-card{position:relative; height:100%; border:1px solid var(--border); border-radius:20px; background:#000; overflow:hidden}
   .page-card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in}
   .page-card-scrim{position:absolute; inset:0; background:linear-gradient(#0000 36%,#000000e6 100%); pointer-events:none}
-  .page-card-arrow{
-    position:absolute; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:9999px;
-    border:1px solid #ffffff40; background:#00000059; backdrop-filter:blur(6px); color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1; cursor:pointer;
+  .pic-picker{position:absolute; top:10px; left:10px; right:10px; display:flex; flex-wrap:wrap; gap:6px}
+  .pic-dot{
+    width:30px; height:30px; border-radius:50%; object-fit:cover; cursor:pointer;
+    border:2px solid rgba(255,255,255,.55); box-shadow:0 1px 4px rgba(0,0,0,.5); flex-shrink:0;
   }
-  .page-card-arrow:active{opacity:.7}
-  .page-card-arrow.left{left:10px} .page-card-arrow.right{right:10px}
+  .pic-dot.active{border-color:var(--accent); box-shadow:0 0 0 2px #fff}
   .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto}
   .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
   .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
@@ -99,7 +99,7 @@
   .confirm-actions{display:flex; gap:10px}
 
   .deck-nav{
-    position:sticky; bottom:0; flex-shrink:0; display:flex; gap:10px;
+    position:sticky; bottom:0; flex-shrink:0; display:flex; align-items:center; gap:8px;
     padding:10px 14px calc(env(safe-area-inset-bottom) + 12px);
     background:linear-gradient(180deg,#13111300 0%,var(--bg) 35%);
   }
@@ -233,17 +233,88 @@ var pages=[
 {id:113,name:"From Zero／Unshatter：專輯名稱含義",arch:"B",sub:"",imgs:2,body:["新專輯名稱《From Zero》，Zero這詞是樂團的原點Xero，預告樂團回歸的倒數直播標題使用了ø這個符號，亦是Zero的意思，各方面都是樂團的「從零開始」","。","「Shatter」","指的是玻璃或物件破裂成無數碎片，而將其轉為「Unshatter」","，字面意思是「讓碎片回歸原狀」","，然而破碎過的東西無法恢復到完美無缺，這個詞象徵的不是「時光倒流、抹去創傷」","，而是將所有碎裂的記憶、悲傷與遺憾重新整合。","樂團如何從零開始？","如何從破碎再次重新修復？","將由Joe導演，紀錄並呈現在《Unshatter》裡面。"]}
 ];
 
-/* 每張卡片的短標籤（用於分頁主題標籤列） */
-var tagMap={
-  1:"基本資料",2:"造型與嗜好①",3:"造型與嗜好②",4:"歌聲信心",5:"音樂啟蒙①",6:"音樂啟蒙②",7:"美術才華",8:"組團淵源①",9:"組團淵源②",10:"Fort Minor",11:"創作理念①",12:"創作理念②",13:"痛失夥伴①",14:"痛失夥伴②",15:"致敬演唱會",16:"療傷專輯①",17:"療傷專輯②",18:"個人專輯①",19:"個人專輯②",20:"Twitch直播①",21:"Twitch直播②",22:"回歸單曲",23:"找回自信①",24:"找回自信②",25:"倒數直播",26:"回歸預告",27:"基本資料",28:"搞笑擔當",29:"刺青胎記",30:"高爾夫健身",31:"音樂養成①",32:"音樂養成②",33:"缺席趣事",34:"樂團調和者",35:"情感支柱①",36:"情感支柱②",37:"基本資料",38:"電波個性",39:"體態變化",40:"藝術背景",41:"加入樂團",42:"MV導演",43:"促成回歸①",44:"促成回歸②",45:"基本資料",46:"毒舌日常",47:"組團經歷①",48:"組團經歷②",49:"促成簽約",50:"三年碰壁",51:"回歸參與度①",52:"回歸參與度②",53:"基本資料①",54:"基本資料②",55:"面對酸民",56:"溫柔一面①",57:"溫柔一面②",58:"歌唱啟蒙①",59:"歌唱啟蒙②",60:"歌唱啟蒙③",61:"早期樂團①",62:"早期樂團②",63:"團名由來①",64:"團名由來②",65:"公司施壓",66:"成癮背景①",67:"成癮背景②",68:"戒酒諮商①",69:"戒酒諮商②",70:"與Mike默契",71:"副企劃①",72:"副企劃②",73:"受傷與爭議①",74:"受傷與爭議②",75:"永遠懷念①",76:"永遠懷念②",77:"基本資料①",78:"基本資料②",79:"組團經歷①",80:"組團經歷②",81:"黑暗時期①",82:"黑暗時期②",83:"淡出樂團①",84:"淡出樂團②",85:"基本資料①",86:"基本資料②",87:"粉絲互動",88:"音樂養成①",89:"音樂養成②",90:"製作人生涯①",91:"製作人生涯②",92:"與Mike合作①",93:"與Mike合作②",94:"無試鏡加入①",95:"無試鏡加入②",96:"基本資料",97:"崗位挑戰①",98:"崗位挑戰②",99:"社群風格",100:"音樂啟蒙①",101:"音樂啟蒙②",102:"音樂啟蒙③",103:"初次接觸",104:"Demo誕生①",105:"Demo誕生②",106:"正式加入①",107:"正式加入②",108:"正式加入③",109:"回歸籌備",110:"老歌挑戰①",111:"老歌挑戰②",112:"專輯命名①",113:"專輯命名②"
-};
-
 /* 每張卡片挑選的最佳畫質配圖（來源：linkin park.pptx） */
 var pageImageMap={
   1:"image20.jpg",2:"image13.jpg",3:"image3.jpg",4:"image9.jpg",5:"image28.jpg",6:"image17.jpg",7:"image16.jpg",8:"image43.jpg",9:"image27.jpg",10:"image30.jpg",11:"image24.jpg",12:"image49.jpg",13:"image35.jpg",14:"image38.jpg",15:"image33.jpg",16:"image36.jpg",17:"image34.jpg",18:"image40.jpg",19:"image40.jpg",20:"image45.jpg",21:"image44.jpg",22:"image51.jpg",23:"image55.jpg",24:"image37.jpg",25:"image47.jpg",26:"image52.jpg",27:"image66.jpg",28:"image56.jpg",29:"image69.jpg",30:"image61.jpg",31:"image71.jpg",32:"image79.jpg",33:"image87.jpg",34:"image76.jpg",35:"image74.jpg",36:"image88.jpg",37:"image96.jpg",38:"image100.jpg",39:"image91.jpg",40:"image93.jpg",41:"image92.jpg",42:"image108.jpg",43:"image111.jpg",44:"image101.jpg",45:"image127.jpg",46:"image128.jpg",47:"image118.jpg",48:"image120.jpg",49:"image134.jpg",50:"image117.jpg",51:"image143.jpg",52:"image129.jpg",53:"image130.jpg",54:"image140.jpg",55:"image139.jpg",56:"image137.jpg",57:"image133.jpg",58:"image146.jpg",59:"image144.jpg",60:"image141.jpg",61:"image145.jpg",62:"image142.jpg",63:"image150.jpg",64:"image149.jpg",65:"image154.jpg",66:"image165.jpg",67:"image160.jpg",68:"image166.jpg",69:"image152.jpg",70:"image158.jpg",71:"image164.jpg",72:"image155.jpg",73:"image178.jpg",74:"image162.jpg",75:"image194.jpg",76:"image31.jpg",77:"image177.jpg",78:"image174.jpg",79:"image185.jpg",80:"image172.jpg",81:"image176.jpg",82:"image173.jpg",83:"image180.jpg",84:"image175.jpg",85:"image190.jpg",86:"image186.jpg",87:"image182.jpg",88:"image179.jpg",89:"image181.jpg",90:"image191.jpg",91:"image188.jpg",92:"image189.jpg",93:"image196.jpg",94:"image202.jpg",95:"image195.jpg",96:"image200.jpg",97:"image203.jpg",98:"image201.jpg",99:"image209.jpg",100:"image208.jpg",101:"image223.jpg",102:"image208.jpg",103:"image211.jpg",104:"image217.jpg",105:"image211.jpg",106:"image214.jpg",107:"image213.jpg",108:"image214.jpg",109:"image219.jpg",110:"image226.jpg",111:"image224.jpg",112:"image227.jpg",113:"image228.jpg"
 };
 function imgSrc(p){ return 'images/'+pageImageMap[p.id]; }
+function extraImgSrc(f){ return 'images/'+f; }
+
+/* 每張卡片附加的其餘配圖（來源同上，均分放入原本沒使用到的圖） */
+var extraImages={
+  1:["image25.jpg","image2.jpg","image4.jpg","image11.jpg","image1.jpg","image8.jpg"],
+  2:["image6.jpg","image5.jpg"],
+  3:["image26.jpg"],
+  4:["image12.jpg","image7.jpg"],
+  5:["image14.jpg","img-004-017.jpg"],
+  6:["img-004-018.jpg"],
+  7:["image21.jpg","image18.jpg","image23.jpg","image15.jpg","image10.jpg","image22.jpg"],
+  10:["image19.jpg"],
+  13:["image32.jpg"],
+  15:["image42.jpg","image31.jpg"],
+  16:["image29.jpg"],
+  20:["image51.jpg","image39.jpg"],
+  21:["image41.jpg"],
+  22:["image45.jpg","image44.jpg","image41.jpg","image39.jpg"],
+  23:["image46.jpg"],
+  27:["image60.jpg","image57.jpg","image50.jpg","image64.jpg","image58.jpg","image53.jpg","image48.jpg","image54.jpg"],
+  28:["image67.jpg","image72.jpg","image70.jpg","image65.jpg"],
+  29:["image63.jpg","image59.jpg"],
+  30:["image73.jpg","image82.jpg","image68.jpg"],
+  31:["image90.jpg"],
+  32:["image62.jpg"],
+  33:["image77.jpg","image80.jpg","image78.jpg"],
+  34:["image86.jpg","image81.jpg"],
+  35:["image75.jpg"],
+  37:["image84.jpg","image85.jpg","image89.jpg","image83.jpg"],
+  38:["image91.jpg","image95.jpg"],
+  39:["image100.jpg","image95.jpg"],
+  40:["image102.jpg","image105.jpg","image94.jpg"],
+  41:["image106.jpg","image98.jpg","image99.jpg","image104.jpg"],
+  42:["image112.jpg","image107.jpg","image103.jpg","image110.jpg","image97.jpg"],
+  45:["image121.jpg","image113.jpg","image109.jpg"],
+  46:["image116.jpg","image115.jpg","image132.jpg","image119.jpg"],
+  47:["image114.jpg"],
+  49:["image117.jpg","image122.jpg"],
+  50:["image134.jpg","image122.jpg"],
+  51:["image136.jpg","image125.jpg"],
+  52:["image123.jpg"],
+  53:["image139.jpg","image126.jpg"],
+  54:["image124.jpg"],
+  55:["image130.jpg","image140.jpg","image124.jpg","image126.jpg"],
+  56:["image135.jpg"],
+  57:["image131.jpg"],
+  61:["image138.jpg"],
+  63:["image157.jpg"],
+  65:["image159.jpg","image148.jpg","image147.jpg"],
+  66:["image153.jpg"],
+  68:["image171.jpg"],
+  70:["image163.jpg","image161.jpg","image151.jpg"],
+  71:["image169.jpg"],
+  72:["image156.jpg"],
+  73:["image168.jpg"],
+  75:["image193.jpg"],
+  77:["image167.jpg"],
+  81:["image170.jpg"],
+  85:["image183.jpg"],
+  87:["image184.jpg"],
+  90:["image192.jpg"],
+  91:["image187.jpg"],
+  96:["image222.jpg","image199.jpg","image207.jpg","image206.jpg","image218.jpg"],
+  97:["image198.jpg"],
+  98:["image197.jpg"],
+  99:["image205.jpg","image204.jpg","image210.jpg"],
+  103:["image217.jpg"],
+  109:["image225.jpg","image215.jpg","image221.jpg"]
+};
 function attr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+function cardImages(p){
+  var arr=[imgSrc(p)];
+  var extras=extraImages[p.id];
+  if(extras){ extras.forEach(function(f){ arr.push(extraImgSrc(f)); }); }
+  return arr;
+}
+function selectImg(i){ state.activeImgIdx=i; renderApp(); }
 
 /* 依照 arch==='A' 的頁面把 pages 拆成各團員分組 */
 var members=[];
@@ -257,35 +328,60 @@ pages.forEach(function(p){
   members[members.length-1].pages.push(p);
 });
 
-var state={view:'home',memberIdx:0,cardIdx:0,dragX:0,dragging:false,lightbox:false,pendingNav:null};
+/* 大標籤：每位團員最多6個，依內容分成連續的章節區塊 */
+var chapterDefs=[
+  [{t:'基本資料',n:1},{t:'個性與嗜好',n:6},{t:'組團與創作',n:5},{t:'傷痛與療傷',n:7},{t:'沉潛歲月',n:3},{t:'樂團回歸',n:4}],
+  [{t:'基本資料',n:1},{t:'個性與嗜好',n:3},{t:'樂團經歷',n:4},{t:'陪伴與支持',n:2}],
+  [{t:'基本資料',n:1},{t:'個性與造型',n:2},{t:'藝術與樂團',n:3},{t:'促成回歸',n:2}],
+  [{t:'基本資料',n:1},{t:'個性與組團',n:3},{t:'促成簽約',n:2},{t:'回歸參與',n:2}],
+  [{t:'基本資料',n:2},{t:'個性與溫柔面',n:3},{t:'早期音樂路',n:7},{t:'掙扎與成癮',n:5},{t:'與夥伴同行',n:3},{t:'最後歲月',n:4}],
+  [{t:'基本資料',n:2},{t:'組團經歷',n:2},{t:'黑暗時期',n:2},{t:'淡出樂團',n:2}],
+  [{t:'基本資料',n:2},{t:'粉絲互動',n:1},{t:'音樂養成',n:2},{t:'製作人生涯',n:2},{t:'與Mike合作',n:2},{t:'加入樂團',n:2}],
+  [{t:'基本資料',n:1},{t:'舞台個性',n:3},{t:'音樂啟蒙與初遇',n:4},{t:'加入樂團',n:5},{t:'回歸籌備',n:3},{t:'全新專輯',n:2}]
+];
+members.forEach(function(m,mi){
+  var chapters=[]; var cursor=0;
+  chapterDefs[mi].forEach(function(d,ci){
+    chapters.push({title:d.t,start:cursor,count:d.n});
+    for(var k=0;k<d.n;k++){ m.pages[cursor+k]._chapterIdx=ci; }
+    cursor+=d.n;
+  });
+  m.chapters=chapters;
+});
+
+var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,dragX:0,dragging:false,lightbox:null,pendingNav:null};
 
 function currentMember(){ return members[state.memberIdx]; }
 function currentCard(){ return currentMember().pages[state.cardIdx]; }
+function currentChapterIdx(){ return currentCard()._chapterIdx; }
+function currentChapter(){ return currentMember().chapters[currentChapterIdx()]; }
+function setCard(i){ state.cardIdx=i; state.activeImgIdx=0; }
 
-function openMember(i){ state.memberIdx=i; state.cardIdx=0; state.view='deck'; renderApp(); }
+function openMember(i){ state.memberIdx=i; setCard(0); state.view='deck'; renderApp(); }
 function goHome(){ state.view='home'; renderApp(); }
 
-function jumpToIndex(i){ state.cardIdx=i; renderApp(); }
+function jumpToChapter(i){ setCard(currentMember().chapters[i].start); renderApp(); }
+function jumpToIndex(i){ setCard(i); renderApp(); }
 
 function prevCard(){
-  if(state.cardIdx>0){ state.cardIdx--; renderApp(); }
+  if(state.cardIdx>0){ setCard(state.cardIdx-1); renderApp(); }
   else if(state.memberIdx>0){ state.pendingNav=-1; renderApp(); }
 }
 function nextCard(){
   var m=currentMember();
-  if(state.cardIdx<m.pages.length-1){ state.cardIdx++; renderApp(); }
+  if(state.cardIdx<m.pages.length-1){ setCard(state.cardIdx+1); renderApp(); }
   else if(state.memberIdx<members.length-1){ state.pendingNav=1; renderApp(); }
 }
 function confirmNav(){
   var d=state.pendingNav; state.pendingNav=null;
-  if(d===1){ state.memberIdx++; state.cardIdx=0; }
-  else { state.memberIdx--; state.cardIdx=members[state.memberIdx].pages.length-1; }
+  if(d===1){ state.memberIdx++; setCard(0); }
+  else { state.memberIdx--; setCard(members[state.memberIdx].pages.length-1); }
   renderApp();
 }
 function cancelNav(){ state.pendingNav=null; renderApp(); }
 
-function openLightbox(){ state.lightbox=true; renderApp(); }
-function closeLightbox(){ state.lightbox=false; renderApp(); }
+function openLightbox(src){ state.lightbox=src; renderApp(); }
+function closeLightbox(){ state.lightbox=null; renderApp(); }
 
 var touchStartX=0, touching=false;
 function cardTouchStart(e){ if(state.pendingNav!==null) return; touching=true; touchStartX=e.touches[0].clientX; state.dragX=0; }
@@ -331,39 +427,49 @@ function renderHome(){
 }
 
 function renderProgress(){
-  var m=currentMember(), idx=state.cardIdx;
+  var m=currentMember(), curCh=currentChapterIdx();
   var segs=m.pages.map(function(p,i){
-    var cls='seg'+(i===idx?' active':(i<idx?' done':''));
-    return '<div class="'+cls+'"></div>';
+    var cls='seg'+(p._chapterIdx===curCh?' active':'')+(i===state.cardIdx?' current':'');
+    return '<div class="'+cls+'" onclick="jumpToIndex('+i+')"></div>';
   }).join('');
   return '<div class="deck-progress">'+segs+'</div>';
 }
 
 function renderTags(){
-  var m=currentMember();
-  return '<div class="tagrow-nav" id="tagrowNav">'+m.pages.map(function(p,i){
-    return '<button class="tagbtn'+(i===state.cardIdx?' active':'')+'" onclick="jumpToIndex('+i+')">'+attr(tagMap[p.id])+'</button>';
+  var m=currentMember(), curCh=currentChapterIdx();
+  return '<div class="tagrow-nav" id="tagrowNav">'+m.chapters.map(function(ch,i){
+    return '<button class="tagbtn'+(i===curCh?' active':'')+'" onclick="jumpToChapter('+i+')">'+attr(ch.title)+'</button>';
   }).join('')+'</div>';
 }
 
 function renderHeader(){
-  var m=currentMember();
+  var m=currentMember(), ch=currentChapter();
   return '<div class="deck-header">'+
     '<button class="icon-btn" onclick="goHome()">‹</button>'+
-    '<div class="deck-header-title"><span class="deck-header-name">'+m.zh+'</span>'+
-    '<span class="deck-header-count">'+(state.cardIdx+1)+' / '+m.pages.length+'</span></div>'+
+    '<div class="deck-header-title"><span class="deck-header-name">'+attr(m.zh)+'</span>'+
+    '<span class="deck-header-count">'+attr(ch.title)+'</span></div>'+
     '<div style="width:36px"></div>'+
   '</div>'+renderProgress()+renderTags();
 }
 
 function renderCard(p){
   var paras=p.body.map(function(t){ return '<p>'+t+'</p>'; }).join('');
+  var imgs=cardImages(p);
+  var activeIdx=state.activeImgIdx<imgs.length?state.activeImgIdx:0;
+  var activeSrc=imgs[activeIdx];
+  var picker='';
+  if(imgs.length>1){
+    picker='<div class="pic-picker">'+imgs.map(function(src,i){
+      return '<img class="pic-dot'+(i===activeIdx?' active':'')+'" src="'+src+'" alt="" onclick="selectImg('+i+')">';
+    }).join('')+'</div>';
+  }
   return '<div class="deck-card-wrap" ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd()">'+
     '<div class="deck-card">'+
       '<div class="page-card">'+
-        '<img class="page-card-img" src="'+imgSrc(p)+'" alt="'+attr(p.name)+'" onclick="openLightbox()">'+
+        '<img class="page-card-img" src="'+activeSrc+'" alt="'+attr(p.name)+'" onclick="openLightbox(\''+activeSrc+'\')">'+
         '<div class="page-card-scrim"></div>'+
-        '<div class="page-card-caption"><h3>'+p.name+'</h3><p class="csub">'+p.sub+'</p>'+paras+'</div>'+
+        picker+
+        '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -371,18 +477,17 @@ function renderCard(p){
 
 function renderFooter(){
   var m=currentMember();
-  var atStart=state.memberIdx===0&&state.cardIdx===0;
-  var atEnd=state.memberIdx===members.length-1&&state.cardIdx===m.pages.length-1;
+  var atVeryStart=state.memberIdx===0&&state.cardIdx===0;
+  var atVeryEnd=state.memberIdx===members.length-1&&state.cardIdx===m.pages.length-1;
   return '<div class="deck-nav">'+
-    '<button class="nav-btn" '+(atStart?'disabled':'')+' onclick="prevCard()">‹ 上一頁</button>'+
-    '<button class="nav-btn primary" '+(atEnd?'disabled':'')+' onclick="nextCard()">下一頁 ›</button>'+
+    '<button class="nav-btn" '+(atVeryStart?'disabled':'')+' onclick="prevCard()">‹ 上一頁</button>'+
+    '<button class="nav-btn primary" '+(atVeryEnd?'disabled':'')+' onclick="nextCard()">下一頁 ›</button>'+
   '</div>';
 }
 
 function renderLightbox(){
   if(!state.lightbox) return '';
-  var p=currentCard();
-  return '<div class="lightbox" onclick="closeLightbox()"><img src="'+imgSrc(p)+'" alt="'+attr(p.name)+'"></div>';
+  return '<div class="lightbox" onclick="closeLightbox()"><img src="'+state.lightbox+'" alt=""></div>';
 }
 
 function renderConfirm(){
