@@ -466,6 +466,15 @@ var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,dragX:0,dragging:fal
 var TOTAL_PAGES = pages.length;
 var VIEWED_KEY = 'lp-viewed-pages';
 var UNLOCK_KEY = 'lp-secret-unlocked';
+var DATA_VERSION_KEY = 'lp-data-version';
+var DATA_VERSION = '2'; // 卡片 id 重新編號時要遞增，讓舊裝置的已讀進度重置，避免頁數對不上
+try{
+  if(localStorage.getItem(DATA_VERSION_KEY) !== DATA_VERSION){
+    localStorage.removeItem(VIEWED_KEY);
+    localStorage.removeItem(UNLOCK_KEY);
+    localStorage.setItem(DATA_VERSION_KEY, DATA_VERSION);
+  }
+}catch(e){}
 
 function getViewed(){
   try{ return JSON.parse(localStorage.getItem(VIEWED_KEY)) || []; }
