@@ -163,6 +163,16 @@
   .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
   .page-card-caption p{margin:0 0 10px; font-size:14px; line-height:1.7; color:#fff; text-shadow:0 1px 4px #0009; white-space:pre-line}
   .page-card-caption p:last-child{margin-bottom:0}
+  .caption-scrollbar{
+    position:absolute; right:7px; width:4px; border-radius:3px; background:rgba(255,255,255,.22);
+    z-index:4; opacity:0; pointer-events:none; transition:opacity .25s ease; touch-action:none;
+  }
+  .caption-scrollbar.visible{opacity:1; pointer-events:auto}
+  .caption-scrollbar-thumb{
+    position:absolute; left:0; right:0; border-radius:3px; background:rgba(255,255,255,.9);
+    box-shadow:0 0 3px #0009; cursor:grab; touch-action:none;
+  }
+  .caption-scrollbar-thumb:active{cursor:grabbing}
 
   .lightbox{position:fixed; inset:0; z-index:50; background:#000000eb; display:flex; align-items:center; justify-content:center; padding:16px}
   .lightbox img{max-width:100%; max-height:100%; object-fit:contain}
@@ -546,11 +556,23 @@ function cancelNav(){ state.pendingNav=null; renderApp(); }
 function openLightbox(src){ state.lightbox=src; renderApp(); }
 function closeLightbox(){ state.lightbox=null; renderApp(); }
 
-var touchStartX=0, touching=false;
-function cardTouchStart(e){ if(state.pendingNav!==null) return; touching=true; touchStartX=e.touches[0].clientX; state.dragX=0; }
+var touchStartX=0, touchStartY=0, touching=false, swipeAxis=null;
+function cardTouchStart(e){
+  if(state.pendingNav!==null) return;
+  touching=true; swipeAxis=null;
+  touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY;
+  state.dragX=0;
+}
 function cardTouchMove(e){
   if(!touching) return;
   var dx=e.touches[0].clientX-touchStartX;
+  var dy=e.touches[0].clientY-touchStartY;
+  if(swipeAxis===null){
+    /* 手指移動夠明顯前先不判斷方向，避免滑動內文時輕微手抖被誤判成翻頁 */
+    if(Math.abs(dx)<8 && Math.abs(dy)<8) return;
+    swipeAxis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+    if(swipeAxis==='y'){ touching=false; return; } /* 判定為上下滑讀內文，交還原生捲動，不觸發翻頁位移 */
+  }
   var atVeryStart=state.memberIdx===0&&state.cardIdx===0;
   var atVeryEnd=state.memberIdx===members.length-1&&state.cardIdx===currentMember().pages.length-1;
   if(atVeryStart&&dx>0) dx=0;
@@ -560,8 +582,8 @@ function cardTouchMove(e){
   if(el) el.style.transform='translateX('+state.dragX+'px)';
 }
 function cardTouchEnd(){
-  if(!touching) return;
-  touching=false;
+  if(!touching){ swipeAxis=null; return; }
+  touching=false; swipeAxis=null;
   var dx=state.dragX; state.dragX=0;
   if(dx<-60) nextCard();
   else if(dx>60) prevCard();
@@ -684,10 +706,59 @@ function renderCard(p){
         '<div class="page-card-scrim"></div>'+
         picker+
         '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
+        '<div class="caption-scrollbar"><div class="caption-scrollbar-thumb"></div></div>'+
       '</div>'+
     '</div>'+
   '</div>';
 }
+
+/* 文字過多需要滾動時，於文字塊右側顯示常駐可拖曳的捲軸提示（手機上原生捲軸只在觸碰當下短暫出現，容易被忽略） */
+function setupCaptionScrollbar(){
+  var caption=document.querySelector('.page-card-caption');
+  var track=document.querySelector('.caption-scrollbar');
+  var thumb=track&&track.querySelector('.caption-scrollbar-thumb');
+  if(!caption||!track||!thumb){ state._captionScrollLayout=null; return; }
+
+  function layout(){
+    track.style.top=caption.offsetTop+'px';
+    track.style.height=caption.offsetHeight+'px';
+    var overflow=caption.scrollHeight-caption.clientHeight;
+    if(overflow<=2){ track.classList.remove('visible'); return; }
+    track.classList.add('visible');
+    var trackH=caption.clientHeight;
+    var thumbH=Math.max(28, trackH*trackH/caption.scrollHeight);
+    var maxThumbTop=trackH-thumbH;
+    thumb.style.height=thumbH+'px';
+    thumb.style.top=(overflow>0?(caption.scrollTop/overflow)*maxThumbTop:0)+'px';
+  }
+
+  var dragging=false, dragStartY=0, dragStartScrollTop=0;
+  function onPointerMove(e){
+    if(!dragging) return;
+    var trackH=caption.clientHeight, thumbH=thumb.offsetHeight;
+    var maxThumbTop=trackH-thumbH;
+    var scrollRange=caption.scrollHeight-caption.clientHeight;
+    if(maxThumbTop<=0||scrollRange<=0) return;
+    var delta=(e.clientY-dragStartY)*(scrollRange/maxThumbTop);
+    caption.scrollTop=Math.max(0,Math.min(scrollRange,dragStartScrollTop+delta));
+  }
+  function onPointerUp(){
+    dragging=false;
+    document.removeEventListener('pointermove',onPointerMove);
+    document.removeEventListener('pointerup',onPointerUp);
+  }
+  thumb.addEventListener('pointerdown',function(e){
+    dragging=true; dragStartY=e.clientY; dragStartScrollTop=caption.scrollTop;
+    e.preventDefault();
+    document.addEventListener('pointermove',onPointerMove);
+    document.addEventListener('pointerup',onPointerUp);
+  });
+  caption.addEventListener('scroll',layout);
+
+  layout();
+  state._captionScrollLayout=layout;
+}
+window.addEventListener('resize',function(){ if(state._captionScrollLayout) state._captionScrollLayout(); });
 
 function renderFooter(){
   var m=currentMember();
@@ -736,6 +807,7 @@ function renderApp(){
     app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
+    setupCaptionScrollbar();
   }
 }
 try{ if(isUnlocked() && localStorage.getItem('lp-theme')==='unshatter'){ document.documentElement.setAttribute('data-theme','unshatter'); } }catch(e){}
