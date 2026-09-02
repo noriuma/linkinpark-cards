@@ -71,7 +71,9 @@
   html[data-theme="unshatter"] .theme-toggle .switch-track{background:var(--accent); border-color:var(--accent)}
   html[data-theme="unshatter"] .theme-toggle .switch-knob{transform:translateX(18px); background:#1a1400}
   .home-card img,.page-card-img{transition:filter .3s ease}
+  .page-card-img{filter:brightness(.8)}
   html[data-theme="unshatter"] .home-card img,html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1)}
+  html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1) brightness(.8)}
   html[data-theme="unshatter"] .home-card:hover img{filter:none}
   html[data-theme="unshatter"] .home-card::after,html[data-theme="unshatter"] .page-card::after{
     content:''; position:absolute; inset:0; z-index:1; background:var(--accent); mix-blend-mode:multiply;
