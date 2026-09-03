@@ -493,13 +493,29 @@ var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,autoplay:true,dragX:
 var TOTAL_PAGES = pages.length;
 var VIEWED_KEY = 'lp-viewed-pages';
 var UNLOCK_KEY = 'lp-secret-unlocked';
+var LAST_POS_KEY = 'lp-last-position';
 var DATA_VERSION_KEY = 'lp-data-version';
 var DATA_VERSION = '3'; // 卡片 id 重新編號時要遞增，讓舊裝置的已讀進度重置，避免頁數對不上
 try{
   if(localStorage.getItem(DATA_VERSION_KEY) !== DATA_VERSION){
     localStorage.removeItem(VIEWED_KEY);
     localStorage.removeItem(UNLOCK_KEY);
+    localStorage.removeItem(LAST_POS_KEY);
     localStorage.setItem(DATA_VERSION_KEY, DATA_VERSION);
+  }
+}catch(e){}
+function saveLastPosition(){
+  try{ localStorage.setItem(LAST_POS_KEY, JSON.stringify({view:state.view, memberIdx:state.memberIdx, cardIdx:state.cardIdx})); }catch(e){}
+}
+/* 重整頁面時恢復到上次讀到的那張卡片，而不是每次都跳回首頁 */
+try{
+  var savedPos=JSON.parse(localStorage.getItem(LAST_POS_KEY));
+  if(savedPos && savedPos.view==='deck' && typeof savedPos.memberIdx==='number' && typeof savedPos.cardIdx==='number'
+     && savedPos.memberIdx>=0 && savedPos.memberIdx<members.length
+     && savedPos.cardIdx>=0 && savedPos.cardIdx<members[savedPos.memberIdx].pages.length){
+    state.view='deck';
+    state.memberIdx=savedPos.memberIdx;
+    state.cardIdx=savedPos.cardIdx;
   }
 }catch(e){}
 
@@ -847,6 +863,7 @@ function setupAutoplay(){
 }
 function renderApp(){
   var app=document.getElementById('app');
+  saveLastPosition();
   if(state.view==='home'){
     clearAutoplay();
     app.innerHTML=renderHome()+renderUnlockCelebration();
