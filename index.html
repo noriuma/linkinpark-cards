@@ -71,7 +71,8 @@
   html[data-theme="unshatter"] .theme-toggle .switch-track{background:var(--accent); border-color:var(--accent)}
   html[data-theme="unshatter"] .theme-toggle .switch-knob{transform:translateX(18px); background:#1a1400}
   .home-card img,.page-card-img{transition:filter .3s ease}
-  .page-card-img{transition:filter .3s ease, opacity 2.5s ease}
+  .page-card-img{animation:imgFadeIn 2.5s ease}
+  @keyframes imgFadeIn{ from{opacity:0} to{opacity:1} }
   .page-card-img{filter:brightness(.8)}
   html[data-theme="unshatter"] .home-card img,html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1)}
   html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1) brightness(.8)}
@@ -832,16 +833,6 @@ function setupAutoplay(){
     renderApp();
   },3000);
 }
-function setupImageFade(){
-  var img=document.querySelector('.page-card-img');
-  if(!img) return;
-  img.style.opacity='0';
-  function reveal(){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ img.style.opacity='1'; }); }); }
-  /* 圖片若還沒解碼完成就先淡入，會在畫面還沒東西可看時就把transition跑完，等到圖真的畫出來時反而看不到淡入效果 */
-  if(img.complete){ reveal(); }
-  else { img.addEventListener('load',reveal,{once:true}); img.addEventListener('error',reveal,{once:true}); }
-}
-
 function renderApp(){
   var app=document.getElementById('app');
   if(state.view==='home'){
@@ -852,7 +843,6 @@ function renderApp(){
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
     setupCaptionScrollbar();
-    setupImageFade();
     setupAutoplay();
   }
 }
