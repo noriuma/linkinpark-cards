@@ -71,8 +71,10 @@
   html[data-theme="unshatter"] .theme-toggle .switch-track{background:var(--accent); border-color:var(--accent)}
   html[data-theme="unshatter"] .theme-toggle .switch-knob{transform:translateX(18px); background:#1a1400}
   .home-card img,.page-card-img{transition:filter .3s ease}
-  .page-card-img{animation:imgFadeIn 2.5s ease}
+  .page-card-img-new{animation:imgFadeIn 2.5s ease forwards; z-index:1}
+  .page-card-img-old{animation:imgFadeOut 2.5s ease forwards; z-index:0}
   @keyframes imgFadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes imgFadeOut{ from{opacity:1} to{opacity:0} }
   .page-card-img{filter:brightness(.8)}
   html[data-theme="unshatter"] .home-card img,html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1)}
   html[data-theme="unshatter"] .page-card-img{filter:grayscale(1) contrast(1.1) brightness(.8)}
@@ -702,6 +704,7 @@ function renderHeader(){
   '</div>'+renderProgress()+renderTags();
 }
 
+var lastShownImgSrc=null;
 function renderCard(p){
   markViewed(p.id); // 卡片被實際顯示出來才算「閱覽過」
   var paras=p.body.map(function(t){ return '<p>'+t+'</p>'; }).join('');
@@ -718,10 +721,19 @@ function renderCard(p){
         '<span class="pic-dot-inner"><img src="'+src+'" alt=""></span></span>';
     }).join('')+'</div>';
   }
+  /* 同一張卡片內切換照片時，讓舊照片淡出、新照片疊在上面淡入，做出真正的溶接效果；換到不同卡片就不需要這個處理 */
+  var prevSrc=lastShownImgSrc;
+  var crossfade=prevSrc && prevSrc!==activeSrc && imgs.indexOf(prevSrc)!==-1;
+  var newImgAttrs='alt="'+attr(p.name)+'"'+(imgFocus(activeSrc)?' style="object-position:'+imgFocus(activeSrc)+'"':'')+' onclick="openLightbox(\''+activeSrc+'\')"';
+  var imgsHtml=crossfade
+    ? '<img class="page-card-img page-card-img-old" src="'+prevSrc+'" alt="">'+
+      '<img class="page-card-img page-card-img-new" src="'+activeSrc+'" '+newImgAttrs+'>'
+    : '<img class="page-card-img" src="'+activeSrc+'" '+newImgAttrs+'>';
+  lastShownImgSrc=activeSrc;
   return '<div class="deck-card-wrap" ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd()">'+
     '<div class="deck-card">'+
       '<div class="page-card">'+
-        '<img class="page-card-img" src="'+activeSrc+'" alt="'+attr(p.name)+'"'+(imgFocus(activeSrc)?' style="object-position:'+imgFocus(activeSrc)+'"':'')+' onclick="openLightbox(\''+activeSrc+'\')">'+
+        imgsHtml+
         '<div class="page-card-scrim"></div>'+
         picker+
         '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
