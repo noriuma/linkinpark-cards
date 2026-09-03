@@ -836,7 +836,10 @@ function setupImageFade(){
   var img=document.querySelector('.page-card-img');
   if(!img) return;
   img.style.opacity='0';
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){ img.style.opacity='1'; }); });
+  function reveal(){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ img.style.opacity='1'; }); }); }
+  /* 圖片若還沒解碼完成就先淡入，會在畫面還沒東西可看時就把transition跑完，等到圖真的畫出來時反而看不到淡入效果 */
+  if(img.complete){ reveal(); }
+  else { img.addEventListener('load',reveal,{once:true}); img.addEventListener('error',reveal,{once:true}); }
 }
 
 function renderApp(){
