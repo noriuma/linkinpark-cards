@@ -132,14 +132,16 @@
     background:var(--bg-elevated); color:var(--text); font-size:18px; line-height:1; cursor:pointer;
   }
   .icon-btn:active{opacity:.8}
-  .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:4px; padding:0 12px 10px}
+  .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 12px 10px; overflow-x:auto; scrollbar-width:none}
+  .deck-progress::-webkit-scrollbar{display:none}
+  .seg-group{display:flex; align-items:center; gap:4px; flex:0 0 auto}
   .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04); cursor:pointer; transition:height .15s,background .15s}
   .seg.viewed{background:var(--text-dim)}
   .seg.active{background:var(--accent)}
   .seg.active.viewed{background:var(--accent)}
   .seg.current{height:6px}
 
-  .tagrow-nav{flex-shrink:0; display:flex; gap:8px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
+  .tagrow-nav{flex-shrink:0; display:flex; gap:10px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
   .tagrow-nav::-webkit-scrollbar{display:none}
   .tagbtn{
     flex-shrink:0; font-size:12px; font-weight:600; padding:6px 13px; border-radius:9999px;
@@ -169,7 +171,8 @@
   .pic-dot-ring{position:absolute; width:42px; height:42px; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-90deg); pointer-events:none}
   .pic-dot-ring circle{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; animation:dotCountdown 5s linear forwards}
   @keyframes dotCountdown{ from{stroke-dashoffset:0} to{stroke-dashoffset:113.1} }
-  .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2}
+  .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2; scrollbar-width:none; -ms-overflow-style:none}
+  .page-card-caption::-webkit-scrollbar{display:none; width:0; height:0}
   .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
   .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
   .page-card-caption p{margin:0 0 10px; font-size:14px; line-height:1.7; color:#fff; text-shadow:0 1px 4px #0009; white-space:pre-line}
@@ -483,9 +486,8 @@ var chapterDefs=[
 ];
 members.forEach(function(m,mi){
   var chapters=[]; var cursor=0;
-  chapterDefs[mi].forEach(function(d,ci){
+  chapterDefs[mi].forEach(function(d){
     chapters.push({title:d.t,start:cursor,count:d.n});
-    for(var k=0;k<d.n;k++){ m.pages[cursor+k]._chapterIdx=ci; }
     cursor+=d.n;
   });
   m.chapters=chapters;
@@ -689,15 +691,19 @@ function renderHome(){
 function renderProgress(){
   var m=currentMember(), curCh=currentChapterIdx();
   var viewed=getViewed();
-  var segs=m.pages.map(function(p,i){
-    var isViewed=viewed.indexOf(p.id)!==-1;
-    var cls='seg'
-      +(p._chapterIdx===curCh?' active':'')
-      +(i===state.cardIdx?' current':'')
-      +(isViewed?' viewed':'');
-    return '<div class="'+cls+'" onclick="jumpToIndex('+i+')" title="'+(isViewed?'已讀':'未讀')+'"></div>';
+  var groups=m.chapters.map(function(ch,ci){
+    var segs=m.pages.slice(ch.start, ch.start+ch.count).map(function(p,li){
+      var i=ch.start+li;
+      var isViewed=viewed.indexOf(p.id)!==-1;
+      var cls='seg'
+        +(ci===curCh?' active':'')
+        +(i===state.cardIdx?' current':'')
+        +(isViewed?' viewed':'');
+      return '<div class="'+cls+'" onclick="jumpToIndex('+i+')" title="'+(isViewed?'已讀':'未讀')+'"></div>';
+    }).join('');
+    return '<div class="seg-group" data-chapter="'+ci+'">'+segs+'</div>';
   }).join('');
-  return '<div class="deck-progress">'+segs+'</div>';
+  return '<div class="deck-progress">'+groups+'</div>';
 }
 
 function renderTags(){
@@ -709,6 +715,14 @@ function renderTags(){
     var cls='tagbtn'+(i===curCh?' active':'')+(allDone?' done':'');
     return '<button class="'+cls+'" onclick="jumpToChapter('+i+')">'+attr(ch.title)+'</button>';
   }).join('')+'</div>';
+}
+
+/* 讓長條分段的寬度跟著底下同一章節的標籤按鈕實際寬度走，而不是反過來把標籤擠窄 */
+function syncProgressGroupWidths(){
+  var groups=document.querySelectorAll('.seg-group');
+  var tags=document.querySelectorAll('.tagbtn');
+  if(groups.length!==tags.length) return;
+  for(var i=0;i<groups.length;i++){ groups[i].style.width=tags[i].offsetWidth+'px'; }
 }
 
 function renderHeader(){
@@ -873,6 +887,7 @@ function renderApp(){
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
     setupCaptionScrollbar();
+    syncProgressGroupWidths();
     setupAutoplay();
   }
 }
