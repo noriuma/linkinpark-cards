@@ -725,6 +725,18 @@ function syncProgressGroupWidths(){
   for(var i=0;i<groups.length;i++){ groups[i].style.width=tags[i].offsetWidth+'px'; }
 }
 
+/* 把當前章節固定捲動到標籤列最左側（而非置中），讓它跟上面的長條維持同一個捲動位置；後面空間不夠就自然留白 */
+function syncActiveChapterScroll(){
+  var tagrowNav=document.getElementById('tagrowNav');
+  var activeTag=tagrowNav&&tagrowNav.querySelector('.tagbtn.active');
+  if(!tagrowNav||!activeTag) return;
+  var pad=parseFloat(getComputedStyle(tagrowNav).paddingLeft)||0;
+  var target=Math.max(0, activeTag.getBoundingClientRect().left-tagrowNav.getBoundingClientRect().left+tagrowNav.scrollLeft-pad);
+  tagrowNav.scrollLeft=target;
+  var progress=document.querySelector('.deck-progress');
+  if(progress) progress.scrollLeft=target;
+}
+
 function renderHeader(){
   var m=currentMember(), ch=currentChapter();
   return '<div class="deck-header">'+
@@ -887,13 +899,12 @@ function renderApp(){
     var prevScrollTop=prevCaption?prevCaption.scrollTop:0;
     var prevPageId=prevCaption?prevCaption.getAttribute('data-page-id'):null;
     app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
-    var active=app.querySelector('.tagbtn.active');
-    if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
     /* 同一張卡片內只是切換照片（自動輪播或手動點縮圖）時，保留文字塊原本捲動的位置，不要強制跳回頂端 */
     var newCaption=app.querySelector('.page-card-caption');
     if(newCaption && prevPageId===String(currentCard().id)){ newCaption.scrollTop=prevScrollTop; }
     setupCaptionScrollbar();
     syncProgressGroupWidths();
+    syncActiveChapterScroll();
     setupAutoplay();
   }
 }
