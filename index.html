@@ -167,7 +167,7 @@
     content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:multiply; pointer-events:none;
   }
   .pic-dot-ring{position:absolute; width:42px; height:42px; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-90deg); pointer-events:none}
-  .pic-dot-ring circle{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; animation:dotCountdown 8s linear forwards}
+  .pic-dot-ring circle{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; animation:dotCountdown 5s linear forwards}
   @keyframes dotCountdown{ from{stroke-dashoffset:0} to{stroke-dashoffset:113.1} }
   .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2}
   .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
@@ -860,7 +860,7 @@ function setupAutoplay(){
     if(state.view!=='deck'||!state.autoplay) return;
     state.activeImgIdx=(state.activeImgIdx+1)%imgs.length;
     renderApp();
-  },8000);
+  },5000);
 }
 function renderApp(){
   var app=document.getElementById('app');
