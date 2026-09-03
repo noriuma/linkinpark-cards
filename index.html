@@ -150,16 +150,20 @@
   .page-card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in; z-index:0}
   .page-card-scrim{position:absolute; inset:0; background:linear-gradient(#0000 36%,#000000e6 100%); pointer-events:none; z-index:2}
   .pic-picker{position:absolute; top:10px; right:10px; max-width:75%; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; pointer-events:auto; z-index:3}
-  .pic-dot{
-    position:relative; width:30px; height:30px; border-radius:50%; overflow:hidden; cursor:pointer; pointer-events:auto;
-    border:2px solid rgba(255,255,255,.55); box-shadow:0 1px 4px rgba(0,0,0,.5); flex-shrink:0;
+  .pic-dot{position:relative; width:30px; height:30px; cursor:pointer; pointer-events:auto; flex-shrink:0}
+  .pic-dot-inner{
+    position:absolute; inset:0; border-radius:50%; overflow:hidden;
+    border:2px solid rgba(255,255,255,.55); box-shadow:0 1px 4px rgba(0,0,0,.5);
   }
-  .pic-dot.active{border-color:var(--accent); box-shadow:0 0 0 2px #fff}
+  .pic-dot.active .pic-dot-inner{border-color:var(--accent); box-shadow:0 0 0 2px #fff}
   .pic-dot img{width:100%; height:100%; object-fit:cover; display:block; transition:filter .3s ease}
   html[data-theme="unshatter"] .pic-dot img{filter:grayscale(1) contrast(1.1)}
-  html[data-theme="unshatter"] .pic-dot::after{
+  html[data-theme="unshatter"] .pic-dot-inner::after{
     content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:multiply; pointer-events:none;
   }
+  .pic-dot-ring{position:absolute; inset:-4px; pointer-events:none; transform:rotate(-90deg)}
+  .pic-dot-ring circle{fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; animation:dotCountdown 3s linear forwards}
+  @keyframes dotCountdown{ from{stroke-dashoffset:0} to{stroke-dashoffset:100.5} }
   .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2}
   .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
   .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
@@ -447,7 +451,7 @@ function cardImages(p){
   if(extras){ extras.forEach(function(f){ arr.push(extraImgSrc(f)); }); }
   return arr;
 }
-function selectImg(i){ state.activeImgIdx=i; renderApp(); }
+function selectImg(i){ state.activeImgIdx=i; state.autoplay=false; renderApp(); }
 
 /* 依照 arch==='A' 的頁面把 pages 拆成各團員分組 */
 var members=[];
@@ -481,7 +485,7 @@ members.forEach(function(m,mi){
   });
   m.chapters=chapters;
 });
-var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,dragX:0,dragging:false,lightbox:null,pendingNav:null,justUnlocked:false};
+var state={view:'home',memberIdx:0,cardIdx:0,activeImgIdx:0,autoplay:true,dragX:0,dragging:false,lightbox:null,pendingNav:null,justUnlocked:false};
 var TOTAL_PAGES = pages.length;
 var VIEWED_KEY = 'lp-viewed-pages';
 var UNLOCK_KEY = 'lp-secret-unlocked';
@@ -537,13 +541,13 @@ function activateUnshatterAndClose(){
 function jumpToChapter(i){ setCard(currentMember().chapters[i].start); renderApp(); }
 function jumpToIndex(i){ setCard(i); renderApp(); }
 
-function openMember(i){ state.memberIdx=i; state.cardIdx=0; state.activeImgIdx=0; state.view='deck'; renderApp(); }
+function openMember(i){ state.memberIdx=i; state.cardIdx=0; state.activeImgIdx=0; state.autoplay=true; state.view='deck'; renderApp(); }
 function currentMember(){ return members[state.memberIdx]; }
 function currentCard(){ return currentMember().pages[state.cardIdx]; }
 function currentChapter(){ return currentMember().chapters.find(function(ch){ return ch.start<=state.cardIdx && state.cardIdx<ch.start+ch.count; }); }
 function currentChapterIdx(){ return currentMember().chapters.findIndex(function(ch){ return ch.start<=state.cardIdx && state.cardIdx<ch.start+ch.count; }); }
-function setCard(n){ state.cardIdx=n; state.activeImgIdx=0; }
-function goHome(){ state.view='home'; state.pendingNav=null; state.lightbox=null; renderApp(); }
+function setCard(n){ state.cardIdx=n; state.activeImgIdx=0; state.autoplay=true; }
+function goHome(){ state.view='home'; state.pendingNav=null; state.lightbox=null; clearAutoplay(); renderApp(); }
 
 function prevCard(){
   if(state.cardIdx>0){ setCard(state.cardIdx-1); renderApp(); }
@@ -704,8 +708,12 @@ function renderCard(p){
   var activeSrc=imgs[activeIdx];
   var picker='';
   if(imgs.length>1){
+    var ringSvg='<svg class="pic-dot-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" stroke-dasharray="100.5"/></svg>';
     picker='<div class="pic-picker">'+imgs.map(function(src,i){
-      return '<span class="pic-dot'+(i===activeIdx?' active':'')+'" onclick="selectImg('+i+')"><img src="'+src+'" alt=""></span>';
+      var isActive=i===activeIdx;
+      return '<span class="pic-dot'+(isActive?' active':'')+'" onclick="selectImg('+i+')">'+
+        (isActive&&state.autoplay?ringSvg:'')+
+        '<span class="pic-dot-inner"><img src="'+src+'" alt=""></span></span>';
     }).join('')+'</div>';
   }
   return '<div class="deck-card-wrap" ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd()">'+
@@ -808,15 +816,40 @@ function renderUnlockCelebration(){
   '</div></div>';
 }
 
+/* 圖片輪播：每3秒自動切下一張並淡入，手動點選縮圖後停止 */
+var autoplayTimer=null;
+function clearAutoplay(){ if(autoplayTimer){ clearTimeout(autoplayTimer); autoplayTimer=null; } }
+function setupAutoplay(){
+  clearAutoplay();
+  if(state.view!=='deck'||!state.autoplay) return;
+  var imgs=cardImages(currentCard());
+  if(imgs.length<=1) return;
+  autoplayTimer=setTimeout(function(){
+    autoplayTimer=null;
+    if(state.view!=='deck'||!state.autoplay) return;
+    state.activeImgIdx=(state.activeImgIdx+1)%imgs.length;
+    renderApp();
+  },3000);
+}
+function setupImageFade(){
+  var img=document.querySelector('.page-card-img');
+  if(!img) return;
+  img.style.opacity='0';
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ img.style.opacity='1'; }); });
+}
+
 function renderApp(){
   var app=document.getElementById('app');
   if(state.view==='home'){
+    clearAutoplay();
     app.innerHTML=renderHome()+renderUnlockCelebration();
   } else {
     app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
     setupCaptionScrollbar();
+    setupImageFade();
+    setupAutoplay();
   }
 }
 try{ if(isUnlocked() && localStorage.getItem('lp-theme')==='unshatter'){ document.documentElement.setAttribute('data-theme','unshatter'); } }catch(e){}
