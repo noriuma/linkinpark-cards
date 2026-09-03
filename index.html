@@ -767,7 +767,7 @@ function renderCard(p){
         imgsHtml+
         '<div class="page-card-scrim"></div>'+
         picker+
-        '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
+        '<div class="page-card-caption" data-page-id="'+p.id+'"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
         '<div class="caption-scrollbar"><div class="caption-scrollbar-thumb"></div></div>'+
       '</div>'+
     '</div>'+
@@ -883,9 +883,15 @@ function renderApp(){
     clearAutoplay();
     app.innerHTML=renderHome()+renderUnlockCelebration();
   } else {
+    var prevCaption=app.querySelector('.page-card-caption');
+    var prevScrollTop=prevCaption?prevCaption.scrollTop:0;
+    var prevPageId=prevCaption?prevCaption.getAttribute('data-page-id'):null;
     app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
     var active=app.querySelector('.tagbtn.active');
     if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
+    /* 同一張卡片內只是切換照片（自動輪播或手動點縮圖）時，保留文字塊原本捲動的位置，不要強制跳回頂端 */
+    var newCaption=app.querySelector('.page-card-caption');
+    if(newCaption && prevPageId===String(currentCard().id)){ newCaption.scrollTop=prevScrollTop; }
     setupCaptionScrollbar();
     syncProgressGroupWidths();
     setupAutoplay();
