@@ -366,7 +366,12 @@ function imgSrc(p){ return 'images/'+pageImageMap[p.id]; }
 function extraImgSrc(f){ return 'images/'+f; }
 
 /* 個別圖片裁切時主體被切到，指定 object-position 讓裁切時偏向該側而非置中 */
-var imgFocusMap={ 'images/mike/m_11_1.jpg':'left' };
+var imgFocusMap={
+  'images/mike/m_11_1.jpg':'left',
+  'images/mike/m_15_2.jpg':'right',
+  'images/brad/b_5_1.jpg':'right',
+  'images/colin/co_5_1.jpg':'left'
+};
 function imgFocus(src){ return imgFocusMap[src]||''; }
 
 /* 每張卡片附加的其餘配圖（來源同上，均分放入原本沒使用到的圖） */
