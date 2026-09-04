@@ -541,6 +541,7 @@ function markViewed(id){
   if(viewed.indexOf(id)===-1){
     viewed.push(id);
     try{ localStorage.setItem(VIEWED_KEY, JSON.stringify(viewed)); }catch(e){}
+    try{ fetch('https://linkinpark-counter.majikayo147.workers.dev/hit?page='+id,{method:'POST'}); }catch(e){}
     if(viewed.length>=TOTAL_PAGES && !isUnlocked()){
       try{ localStorage.setItem(UNLOCK_KEY,'1'); }catch(e){}
       state.justUnlocked=true; // 這次是「剛好集滿」的那一刻，觸發慶祝彈窗
