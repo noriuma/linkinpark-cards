@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>公園小百科</title>
 <link rel="icon" type="image/png" href="images/logo.png">
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 <style>
   :root{
@@ -544,6 +545,7 @@ function markViewed(id){
     if(viewed.length>=TOTAL_PAGES && !isUnlocked()){
       try{ localStorage.setItem(UNLOCK_KEY,'1'); }catch(e){}
       state.justUnlocked=true; // 這次是「剛好集滿」的那一刻，觸發慶祝彈窗
+      try{ window.va && window.va('event',{name:'unlocked_unshatter'}); }catch(e){}
     }
   }
 }
