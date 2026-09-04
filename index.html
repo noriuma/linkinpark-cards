@@ -132,14 +132,16 @@
     background:var(--bg-elevated); color:var(--text); font-size:18px; line-height:1; cursor:pointer;
   }
   .icon-btn:active{opacity:.8}
-  .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:4px; padding:0 12px 10px}
+  .deck-progress{flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 12px 10px; overflow-x:auto; scrollbar-width:none}
+  .deck-progress::-webkit-scrollbar{display:none}
+  .seg-group{display:flex; align-items:center; gap:4px; flex:0 0 auto}
   .seg{flex:1; height:3px; border-radius:9999px; background:var(--overlay-04); cursor:pointer; transition:height .15s,background .15s}
   .seg.viewed{background:var(--text-dim)}
   .seg.active{background:var(--accent)}
   .seg.active.viewed{background:var(--accent)}
   .seg.current{height:6px}
 
-  .tagrow-nav{flex-shrink:0; display:flex; gap:8px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
+  .tagrow-nav{flex-shrink:0; display:flex; gap:10px; padding:0 12px 12px; overflow-x:auto; scrollbar-width:none}
   .tagrow-nav::-webkit-scrollbar{display:none}
   .tagbtn{
     flex-shrink:0; font-size:12px; font-weight:600; padding:6px 13px; border-radius:9999px;
@@ -169,7 +171,8 @@
   .pic-dot-ring{position:absolute; width:42px; height:42px; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-90deg); pointer-events:none}
   .pic-dot-ring circle{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; animation:dotCountdown 5s linear forwards}
   @keyframes dotCountdown{ from{stroke-dashoffset:0} to{stroke-dashoffset:113.1} }
-  .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2}
+  .page-card-caption{position:absolute; left:0; right:0; bottom:0; max-height:64%; padding:18px 18px 16px; overflow-y:auto; z-index:2; scrollbar-width:none; -ms-overflow-style:none}
+  .page-card-caption::-webkit-scrollbar{display:none; width:0; height:0}
   .page-card-caption h3{margin:0 0 3px; font-size:17px; font-weight:700; color:#fff; text-shadow:0 1px 4px #0009}
   .page-card-caption .csub{margin:0 0 10px; font-size:12px; color:#fff; opacity:.8; text-shadow:0 1px 4px #0009}
   .page-card-caption p{margin:0 0 10px; font-size:14px; line-height:1.7; color:#fff; text-shadow:0 1px 4px #0009; white-space:pre-line}
@@ -357,13 +360,18 @@ var pages=[
 
 /* 每張卡片挑選的最佳畫質配圖（來源：linkin park.pptx） */
 var pageImageMap={
-  1:"mike/m_1_1.jpg",2:"mike/m_2_1.jpg",3:"mike/m_3_1.jpg",4:"mike/m_4_1.jpg",5:"mike/m_5_1.jpg",6:"mike/m_6_1.jpg",7:"mike/m_7_1.jpg",8:"mike/m_8_1.jpg",9:"mike/m_9_1.jpg",10:"mike/m_10_1.jpg",11:"mike/m_11_1.jpg",12:"mike/m_12_1.jpg",13:"mike/m_13.jpg",14:"mike/m_14_1.jpg",15:"mike/m_15_1.jpg",16:"mike/m_16_1.jpg",17:"mike/m_17_1.jpg",18:"mike/m_18_1.jpg",19:"mike/m_19_1.jpg",20:"mike/m_20_1.jpg",21:"mike/m_21_1.jpg",22:"mike/m_22_1.jpg",23:"mike/m_23_1.jpg",24:"mike/m_24_1.jpg",25:"mike/m_25_1.jpg",26:"dave/d_1_1.jpg",27:"dave/d_2_1.jpg",28:"dave/d_3_1.jpg",29:"dave/d_4_1.jpg",30:"dave/d_5_1.jpg",31:"dave/d_6_1.jpg",32:"dave/d_7_1.jpg",33:"dave/d_8_1.jpg",34:"dave/d_9_1.jpg",35:"dave/d_10_1.jpg",36:"joe/j_1_1.jpg",37:"joe/j_2_1.jpg",38:"joe/j_3_1.jpg",39:"joe/j_4_1.jpg",40:"joe/j_5_1.jpg",41:"joe/j_6_1.jpg",42:"joe/j_7_1.jpg",43:"joe/j_8_1.jpg",44:"brad/b_1_1.jpg",45:"brad/b_2_1.jpg",46:"brad/b_3_1.jpg",47:"brad/b_4_1.jpg",48:"brad/b_5_1.jpg",49:"brad/b_6_1.jpg",50:"brad/b_7_1.jpg",51:"brad/b_8_1.jpg",52:"chester/ch_1_1.jpg",53:"chester/ch_2_1.jpg",54:"chester/ch_3_1.jpg",55:"chester/ch_4_1.jpg",56:"chester/ch_5_1.jpg",57:"chester/ch_6_1.jpg",58:"chester/ch_7_1.jpg",59:"chester/ch_8_1.jpg",60:"chester/ch_9_1.jpg",61:"chester/ch_10_1.jpg",62:"chester/ch_11_1.jpg",63:"chester/ch_12_1.jpg",64:"chester/ch_13_1.jpg",65:"chester/ch_14_1.jpg",66:"chester/ch_15_1.jpg",67:"chester/ch_16_1.jpg",68:"chester/ch_17_1.jpg",69:"chester/ch_18_1.jpg",70:"chester/ch_19_1.jpg",71:"chester/ch_20_1.jpg",72:"chester/ch_21_1.jpg",73:"chester/ch_22_1.jpg",74:"chester/ch_23_1.jpg",75:"rob/r_1_1.jpg",76:"rob/r_2_1.jpg",77:"rob/r_3_1.jpg",78:"rob/r_4_1.jpg",79:"rob/r_5_1.jpg",80:"rob/r_6_1.jpg",81:"rob/r_7_1.jpg",82:"rob/r_8_1.jpg",83:"colin/co_1_1.jpg",84:"colin/co_2_1.jpg",85:"colin/co_3_1.jpg",86:"colin/co_4_1.jpg",87:"colin/co_5_1.jpg",88:"colin/co_6_1.jpg",89:"colin/co_7_1.jpg",90:"colin/co_8_1.jpg",91:"colin/co_9_1.jpg",92:"colin/co_10_1.jpg",93:"colin/co_11_1.jpg",94:"emily/e_1_1.jpg",95:"emily/e_2_1.jpg",96:"emily/e_3_1.jpg",97:"emily/e_4_1.jpg",98:"emily/e_5_1.jpg",99:"emily/e_6_1.jpeg",100:"emily/e_7_1.jpg",101:"emily/e_8_1.jpg",102:"emily/e_9_1.jpg",103:"emily/e_10_1.jpg",104:"emily/e_11_1.jpg",105:"emily/e_12_1.jpg",106:"emily/e_13_1.jpg",107:"emily/e_14_1.jpg",108:"emily/e_15_1.jpg",109:"emily/e_16_1.jpg",110:"emily/e_17_1.jpg"
+  1:"mike/m_1_1.jpg",2:"mike/m_2_1.jpg",3:"mike/m_3_1.jpg",4:"mike/m_4_1.jpg",5:"mike/m_5_1.jpg",6:"mike/m_6_1.jpg",7:"mike/m_7_1.jpg",8:"mike/m_8_1.jpg",9:"mike/m_9_1.jpg",10:"mike/m_10_1.jpg",11:"mike/m_11_1.jpg",12:"mike/m_12_1.jpg",13:"mike/m_13.jpg",14:"mike/m_14_1.jpg",15:"mike/m_15_1.jpg",16:"mike/m_16_1.jpg",17:"mike/m_17_1.jpg",18:"mike/m_18_1.jpg",19:"mike/m_19_1.jpg",20:"mike/m_20_1.jpg",21:"mike/m_21_1.jpg",22:"mike/m_22_1.jpg",23:"mike/m_23_1.jpg",24:"mike/m_24_1.jpg",25:"mike/m_25_1.jpg",26:"dave/d_1_1.jpg",27:"dave/d_2_1.jpg",28:"dave/d_3_1.jpg",29:"dave/d_4_1.jpg",30:"dave/d_5_1.jpg",31:"dave/d_6_1.jpg",32:"dave/d_7_1.jpg",33:"dave/d_8_1.jpg",34:"dave/d_9_1.jpg",35:"dave/d_10_1.jpg",36:"joe/j_1_1.jpg",37:"joe/j_2_1.jpg",38:"joe/j_3_1.jpg",39:"joe/j_4_1.jpg",40:"joe/j_5_1.jpg",41:"joe/j_6_1.jpg",42:"joe/j_7_1.jpg",43:"joe/j_8_1.jpg",44:"brad/b_1_1.jpg",45:"brad/b_2_1.jpg",46:"brad/b_3_1.jpg",47:"brad/b_4_1.jpg",48:"brad/b_5_1.jpg",49:"brad/b_6_1.jpg",50:"brad/b_7_1.jpg",51:"brad/b_8_1.jpg",52:"chester/ch_1_1.jpg",53:"chester/ch_2_1.jpg",54:"chester/ch_3_1.jpg",55:"chester/ch_4_1.jpg",56:"chester/ch_5_1.jpg",57:"chester/ch_6_1.jpg",58:"chester/ch_7_1.jpg",59:"chester/ch_8_1.jpg",60:"chester/ch_9_1.jpg",61:"chester/ch_10_1.jpg",62:"chester/ch_11_1.jpg",63:"chester/ch_12_1.jpg",64:"chester/ch_13_1.jpg",65:"chester/ch_14_1.jpg",66:"chester/ch_15_1.jpg",67:"chester/ch_16_1.jpg",68:"chester/ch_17_1.jpg",69:"chester/ch_18_1.jpg",70:"chester/ch_19_1.jpg",71:"chester/ch_20_1.jpg",72:"chester/ch_21_1.jpg",73:"chester/ch_22_1.jpg",74:"chester/ch_23_1.jpg",75:"rob/r_1_1.jpg",76:"rob/r_2_1.jpg",77:"rob/r_3_1.jpg",78:"rob/r_4_1.jpg",79:"rob/r_5_1.jpg",80:"rob/r_6_1.jpg",81:"rob/r_7_1.jpg",82:"rob/r_8_1.jpg",83:"colin/co_1_1.jpg",84:"colin/co_2_1.jpg",85:"colin/co_3_1.jpg",86:"colin/co_4_1.jpg",87:"colin/co_5_1.jpg",88:"colin/co_6_1.jpg",89:"colin/co_7_1.jpg",90:"colin/co_8_1.jpg",91:"colin/co_9_1.jpg",92:"colin/co_10_1.jpg",93:"colin/co_11_1.jpg",94:"emily/e_1_1.jpg",95:"emily/e_2_1.jpg",96:"emily/e_3_1.jpg",97:"emily/e_4_1.jpg",98:"emily/e_5_1.jpg",99:"emily/e_6_1.jpg",100:"emily/e_7_1.jpg",101:"emily/e_8_1.jpg",102:"emily/e_9_1.jpg",103:"emily/e_10_1.jpg",104:"emily/e_11_1.jpg",105:"emily/e_12_1.jpg",106:"emily/e_13_1.jpg",107:"emily/e_14_1.jpg",108:"emily/e_15_1.jpg",109:"emily/e_16_1.jpg",110:"emily/e_17_1.jpg"
 };
 function imgSrc(p){ return 'images/'+pageImageMap[p.id]; }
 function extraImgSrc(f){ return 'images/'+f; }
 
 /* 個別圖片裁切時主體被切到，指定 object-position 讓裁切時偏向該側而非置中 */
-var imgFocusMap={ 'images/mike/m_11_1.jpg':'left' };
+var imgFocusMap={
+  'images/mike/m_11_1.jpg':'left',
+  'images/mike/m_15_2.jpg':'right',
+  'images/brad/b_5_1.jpg':'right',
+  'images/colin/co_5_1.jpg':'left'
+};
 function imgFocus(src){ return imgFocusMap[src]||''; }
 
 /* 每張卡片附加的其餘配圖（來源同上，均分放入原本沒使用到的圖） */
@@ -483,9 +491,8 @@ var chapterDefs=[
 ];
 members.forEach(function(m,mi){
   var chapters=[]; var cursor=0;
-  chapterDefs[mi].forEach(function(d,ci){
+  chapterDefs[mi].forEach(function(d){
     chapters.push({title:d.t,start:cursor,count:d.n});
-    for(var k=0;k<d.n;k++){ m.pages[cursor+k]._chapterIdx=ci; }
     cursor+=d.n;
   });
   m.chapters=chapters;
@@ -689,15 +696,19 @@ function renderHome(){
 function renderProgress(){
   var m=currentMember(), curCh=currentChapterIdx();
   var viewed=getViewed();
-  var segs=m.pages.map(function(p,i){
-    var isViewed=viewed.indexOf(p.id)!==-1;
-    var cls='seg'
-      +(p._chapterIdx===curCh?' active':'')
-      +(i===state.cardIdx?' current':'')
-      +(isViewed?' viewed':'');
-    return '<div class="'+cls+'" onclick="jumpToIndex('+i+')" title="'+(isViewed?'已讀':'未讀')+'"></div>';
+  var groups=m.chapters.map(function(ch,ci){
+    var segs=m.pages.slice(ch.start, ch.start+ch.count).map(function(p,li){
+      var i=ch.start+li;
+      var isViewed=viewed.indexOf(p.id)!==-1;
+      var cls='seg'
+        +(ci===curCh?' active':'')
+        +(i===state.cardIdx?' current':'')
+        +(isViewed?' viewed':'');
+      return '<div class="'+cls+'" onclick="jumpToIndex('+i+')" title="'+(isViewed?'已讀':'未讀')+'"></div>';
+    }).join('');
+    return '<div class="seg-group" data-chapter="'+ci+'">'+segs+'</div>';
   }).join('');
-  return '<div class="deck-progress">'+segs+'</div>';
+  return '<div class="deck-progress">'+groups+'</div>';
 }
 
 function renderTags(){
@@ -709,6 +720,26 @@ function renderTags(){
     var cls='tagbtn'+(i===curCh?' active':'')+(allDone?' done':'');
     return '<button class="'+cls+'" onclick="jumpToChapter('+i+')">'+attr(ch.title)+'</button>';
   }).join('')+'</div>';
+}
+
+/* 讓長條分段的寬度跟著底下同一章節的標籤按鈕實際寬度走，而不是反過來把標籤擠窄 */
+function syncProgressGroupWidths(){
+  var groups=document.querySelectorAll('.seg-group');
+  var tags=document.querySelectorAll('.tagbtn');
+  if(groups.length!==tags.length) return;
+  for(var i=0;i<groups.length;i++){ groups[i].style.width=tags[i].offsetWidth+'px'; }
+}
+
+/* 把當前章節固定捲動到標籤列最左側（而非置中），讓它跟上面的長條維持同一個捲動位置；後面空間不夠就自然留白 */
+function syncActiveChapterScroll(){
+  var tagrowNav=document.getElementById('tagrowNav');
+  var activeTag=tagrowNav&&tagrowNav.querySelector('.tagbtn.active');
+  if(!tagrowNav||!activeTag) return;
+  var pad=parseFloat(getComputedStyle(tagrowNav).paddingLeft)||0;
+  var target=Math.max(0, activeTag.getBoundingClientRect().left-tagrowNav.getBoundingClientRect().left+tagrowNav.scrollLeft-pad);
+  tagrowNav.scrollLeft=target;
+  var progress=document.querySelector('.deck-progress');
+  if(progress) progress.scrollLeft=target;
 }
 
 function renderHeader(){
@@ -753,7 +784,7 @@ function renderCard(p){
         imgsHtml+
         '<div class="page-card-scrim"></div>'+
         picker+
-        '<div class="page-card-caption"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
+        '<div class="page-card-caption" data-page-id="'+p.id+'"><h3>'+p.name+'</h3>'+(p.sub?'<p class="csub">'+p.sub+'</p>':'')+paras+'</div>'+
         '<div class="caption-scrollbar"><div class="caption-scrollbar-thumb"></div></div>'+
       '</div>'+
     '</div>'+
@@ -837,7 +868,7 @@ function renderConfirm(){
 }
 function renderUnlockCelebration(){
   if(!state.justUnlocked) return '';
-  return '<div class="secret-overlay" onclick="if(event.target===event.currentTarget) dismissUnlock()"><div class="secret-box">'+
+  return '<div class="secret-overlay"><div class="secret-box">'+
     '<div class="secret-mark">ø</div>'+
     '<h2>Unshatter Mode 已解鎖</h2>'+
     '<p>你已經讀完了關於這支樂團的每一段故事——\n從Mike的童年鋼琴課，到Chester的最後那晚，\n再到Emily與Colin加入後的從零開始。\n\n「Unshatter」不是為了抹去傷痛，\n而是為了將所有破碎的悲傷與遺憾重新整合。\n\n現在，你可以切換到 Unshatter Mode 了。</p>'+
@@ -869,10 +900,16 @@ function renderApp(){
     clearAutoplay();
     app.innerHTML=renderHome()+renderUnlockCelebration();
   } else {
+    var prevCaption=app.querySelector('.page-card-caption');
+    var prevScrollTop=prevCaption?prevCaption.scrollTop:0;
+    var prevPageId=prevCaption?prevCaption.getAttribute('data-page-id'):null;
     app.innerHTML='<div class="deck">'+renderHeader()+renderCard(currentCard())+renderFooter()+'</div>'+renderLightbox()+renderConfirm()+renderUnlockCelebration();
-    var active=app.querySelector('.tagbtn.active');
-    if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
+    /* 同一張卡片內只是切換照片（自動輪播或手動點縮圖）時，保留文字塊原本捲動的位置，不要強制跳回頂端 */
+    var newCaption=app.querySelector('.page-card-caption');
+    if(newCaption && prevPageId===String(currentCard().id)){ newCaption.scrollTop=prevScrollTop; }
     setupCaptionScrollbar();
+    syncProgressGroupWidths();
+    syncActiveChapterScroll();
     setupAutoplay();
   }
 }
